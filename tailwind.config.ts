@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,6 +25,13 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				lofty: {
+					blue: '#3399FF',
+					gray: '#F2F2F2',
+					darkgray: '#888888',
+					lightgray: '#F8F8F8',
+					border: '#E5E5E5'
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -84,11 +92,20 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'typing': {
+					'0%': { width: '0%' },
+					'100%': { width: '100%' }
+				},
+				'blink': {
+					'50%': { borderColor: 'transparent' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'typing': 'typing 1.5s steps(20, end)',
+				'blink': 'blink 1s step-end infinite'
 			}
 		}
 	},
