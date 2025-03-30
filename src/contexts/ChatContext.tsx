@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { useToast } from '@/hooks/use-toast';
 
 type MessageRole = 'user' | 'assistant';
 
@@ -28,6 +29,9 @@ interface ChatContextType {
   createNewChat: () => void;
   selectSession: (sessionId: string) => void;
   deleteSession: (sessionId: string) => void;
+  clearAllSessions: () => void;
+  exportSessions: (format: string) => void;
+  archiveSessions: () => void;
 }
 
 const defaultSessions: Session[] = [
@@ -50,6 +54,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>('baby-orchestrator');
+  const { toast } = useToast();
 
   // Get current messages based on the active session
   const messages = currentSession 
@@ -78,6 +83,47 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (currentSession === sessionId) {
       setCurrentSession(null);
     }
+  };
+  
+  const clearAllSessions = () => {
+    setSessions([]);
+    setCurrentSession(null);
+    
+    toast({
+      title: "All sessions cleared",
+      description: "Your chat history has been deleted"
+    });
+  };
+  
+  const exportSessions = (format: string = 'json') => {
+    const sessionData = JSON.stringify(sessions, null, 2);
+    
+    // Create a blob and download link
+    const blob = new Blob([sessionData], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `chat-history-${new Date().toISOString().split('T')[0]}.${format}`;
+    document.body.appendChild(a);
+    a.click();
+    
+    // Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({
+      title: "Export complete",
+      description: `Your chat history has been exported as ${format.toUpperCase()}`
+    });
+  };
+  
+  const archiveSessions = () => {
+    // In a real application, this would move sessions to an archive
+    // For now, we just show a toast
+    toast({
+      title: "Sessions archived",
+      description: "Your chat history has been archived"
+    });
   };
 
   const sendMessage = async (content: string, attachments: File[] = []) => {
@@ -157,7 +203,10 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sendMessage, 
         createNewChat, 
         selectSession,
-        deleteSession
+        deleteSession,
+        clearAllSessions,
+        exportSessions,
+        archiveSessions
       }}
     >
       {children}

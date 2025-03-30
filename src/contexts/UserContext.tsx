@@ -4,6 +4,18 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 type UserProfile = {
   name: string;
   avatar?: string;
+  email?: string;
+  language?: string;
+  theme?: string;
+  notificationSettings?: {
+    push: boolean;
+    email: boolean;
+    sound: boolean;
+  };
+  securitySettings?: {
+    twoFactorEnabled: boolean;
+    lastPasswordChange: string;
+  };
 };
 
 interface UserContextType {
@@ -11,6 +23,8 @@ interface UserContextType {
   darkMode: boolean;
   toggleDarkMode: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
+  updateNotificationSettings: (settings: Partial<UserProfile['notificationSettings']>) => void;
+  updateSecuritySettings: (settings: Partial<UserProfile['securitySettings']>) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -30,7 +44,18 @@ interface UserProviderProps {
 export const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<UserProfile>({
     name: 'User Name',
-    avatar: undefined
+    avatar: undefined,
+    email: 'user@example.com',
+    language: 'english',
+    notificationSettings: {
+      push: true,
+      email: true,
+      sound: true
+    },
+    securitySettings: {
+      twoFactorEnabled: false,
+      lastPasswordChange: new Date().toISOString()
+    }
   });
   
   const [darkMode, setDarkMode] = useState(false);
@@ -70,11 +95,35 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
   };
   
+  const updateNotificationSettings = (settings: Partial<UserProfile['notificationSettings']>) => {
+    const updatedSettings = { 
+      ...user.notificationSettings, 
+      ...settings 
+    };
+    
+    updateUserProfile({
+      notificationSettings: updatedSettings
+    });
+  };
+  
+  const updateSecuritySettings = (settings: Partial<UserProfile['securitySettings']>) => {
+    const updatedSettings = { 
+      ...user.securitySettings, 
+      ...settings 
+    };
+    
+    updateUserProfile({
+      securitySettings: updatedSettings
+    });
+  };
+  
   const value = {
     user,
     darkMode,
     toggleDarkMode,
-    updateUserProfile
+    updateUserProfile,
+    updateNotificationSettings,
+    updateSecuritySettings
   };
   
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

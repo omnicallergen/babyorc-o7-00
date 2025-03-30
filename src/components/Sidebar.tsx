@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings } from 'lucide-react';
+import React, { useState } from 'react';
+import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
 import Logo from './Logo';
@@ -13,11 +13,13 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { useToast } from '@/hooks/use-toast';
+import HistorySettingsModal from './HistorySettingsModal';
 
 const Sidebar: React.FC = () => {
   const { sessions, createNewChat, selectSession, deleteSession } = useChat();
   const { user, darkMode, toggleDarkMode } = useUser();
   const { toast } = useToast();
+  const [historySettingsOpen, setHistorySettingsOpen] = useState(false);
 
   const handleDeleteAllHistory = () => {
     toast({
@@ -25,7 +27,6 @@ const Sidebar: React.FC = () => {
       description: "All chat history has been deleted",
     });
     // This would need to be implemented in ChatContext
-    // For now we'll just show a toast
   };
 
   const handleArchiveHistory = () => {
@@ -76,7 +77,7 @@ const Sidebar: React.FC = () => {
                 <MoreHorizontal size={16} />
               </button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuContent align="end" className="w-48 dark:bg-gray-800 dark:border-gray-700">
               <DropdownMenuItem onClick={handleDeleteAllHistory} className="cursor-pointer">
                 <Trash2 className="mr-2 h-4 w-4" />
                 <span>Clear History</span>
@@ -86,7 +87,7 @@ const Sidebar: React.FC = () => {
                 <span>Archive Chats</span>
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleExportHistory} className="cursor-pointer">
-                <FileText className="mr-2 h-4 w-4" />
+                <FileUp className="mr-2 h-4 w-4" />
                 <span>Export History</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -94,7 +95,10 @@ const Sidebar: React.FC = () => {
                 <Pin className="mr-2 h-4 w-4" />
                 <span>Pin Recent Chats</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem 
+                onClick={() => setHistorySettingsOpen(true)} 
+                className="cursor-pointer"
+              >
                 <Settings className="mr-2 h-4 w-4" />
                 <span>History Settings</span>
               </DropdownMenuItem>
@@ -141,6 +145,12 @@ const Sidebar: React.FC = () => {
           {darkMode ? <Sun size={16} /> : <Moon size={16} />}
         </button>
       </div>
+
+      {/* History Settings Modal */}
+      <HistorySettingsModal 
+        open={historySettingsOpen}
+        onOpenChange={setHistorySettingsOpen}
+      />
     </div>
   );
 };
