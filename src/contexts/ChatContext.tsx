@@ -22,6 +22,8 @@ interface ChatContextType {
   sessions: Session[];
   currentSession: string | null;
   isLoading: boolean;
+  selectedModel: string;
+  setSelectedModel: (model: string) => void;
   sendMessage: (content: string, attachments?: File[]) => Promise<void>;
   createNewChat: () => void;
   selectSession: (sessionId: string) => void;
@@ -47,6 +49,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [sessions, setSessions] = useState<Session[]>(defaultSessions);
   const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string>('baby-orchestrator');
 
   // Get current messages based on the active session
   const messages = currentSession 
@@ -149,6 +152,8 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         sessions, 
         currentSession, 
         isLoading, 
+        selectedModel,
+        setSelectedModel,
         sendMessage, 
         createNewChat, 
         selectSession,
