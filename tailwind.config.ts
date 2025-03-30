@@ -30,7 +30,10 @@ export default {
 					gray: '#F2F2F2',
 					darkgray: '#888888',
 					lightgray: '#F8F8F8',
-					border: '#E5E5E5'
+					border: '#E5E5E5',
+					darkBg: '#151C2E',
+					darkInput: '#212B45',
+					darkBorder: '#2A3249'
 				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',

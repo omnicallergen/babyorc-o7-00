@@ -34,8 +34,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onToolSelect }) => {
   return (
     <div className="p-4 space-y-4">
       {/* Input field */}
-      <div className="flex items-center bg-white border border-lofty-border rounded-full px-4 py-2">
-        <button className="text-lofty-darkgray p-1 mr-2">
+      <div className="flex items-center bg-white dark:bg-lofty-darkInput border border-lofty-border dark:border-lofty-darkBorder rounded-full px-4 py-2">
+        <button className="text-lofty-darkgray dark:text-gray-400 p-1 mr-2">
           <Paperclip size={20} />
         </button>
         <input
@@ -44,7 +44,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onToolSelect }) => {
           onChange={(e) => setMessage(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="message lofty..."
-          className="flex-1 outline-none"
+          className="flex-1 outline-none bg-transparent dark:text-white dark:placeholder-gray-400"
           disabled={isLoading}
         />
         <button 
@@ -62,7 +62,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onToolSelect }) => {
           <button
             key={tool}
             onClick={() => onToolSelect(tool)}
-            className="flex-1 bg-lofty-gray hover:bg-lofty-gray/80 py-2 px-4 rounded-md text-sm"
+            className="flex-1 bg-lofty-gray dark:bg-lofty-darkInput hover:bg-lofty-gray/80 dark:hover:bg-lofty-darkInput/80 py-2 px-4 rounded-md text-sm text-black dark:text-white"
           >
             {tool}
           </button>

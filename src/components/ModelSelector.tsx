@@ -24,7 +24,7 @@ const ModelSelector: React.FC = () => {
   return (
     <div className="relative">
       <button
-        className="inline-flex items-center justify-between gap-2 px-4 py-2 border border-lofty-border rounded-full focus:outline-none min-w-[200px]"
+        className="inline-flex items-center justify-between gap-2 px-4 py-2 border border-lofty-border dark:border-lofty-darkBorder rounded-full focus:outline-none min-w-[200px] dark:bg-lofty-darkInput dark:text-white"
         onClick={toggleDropdown}
       >
         <span>{selectedModel}</span>
@@ -32,13 +32,16 @@ const ModelSelector: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute top-full left-0 mt-1 w-full bg-white border border-lofty-border rounded-md shadow-lg z-10">
+        <div className="absolute top-full left-0 mt-1 w-full bg-white dark:bg-lofty-darkBg border border-lofty-border dark:border-lofty-darkBorder rounded-md shadow-lg z-10">
           <ul className="py-1">
             {models.map((model) => (
               <li key={model.id}>
                 <button
                   className={`flex w-full items-center justify-between px-4 py-2 text-left
-                    ${model.disabled ? 'text-gray-400 cursor-not-allowed' : 'hover:bg-lofty-gray/50'}
+                    ${model.disabled 
+                      ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
+                      : 'hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/70 dark:text-white'
+                    }
                   `}
                   onClick={() => !model.disabled && selectModel(model.id)}
                   disabled={model.disabled}

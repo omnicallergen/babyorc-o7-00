@@ -12,8 +12,8 @@ const MessageList: React.FC = () => {
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="flex flex-col items-center space-y-4">
           <Logo size="medium" />
-          <h1 className="text-3xl font-bold">go:lofty</h1>
-          <p className="text-xl">How can I help you today?</p>
+          <h1 className="text-3xl font-bold dark:text-white">go:lofty</h1>
+          <p className="text-xl dark:text-gray-300">How can I help you today?</p>
         </div>
       </div>
     );
@@ -30,7 +30,7 @@ const MessageList: React.FC = () => {
             className={`max-w-[80%] p-3 rounded-lg ${
               message.role === 'user' 
                 ? 'bg-lofty-blue text-white' 
-                : 'bg-lofty-gray text-black'
+                : 'bg-lofty-gray dark:bg-lofty-darkInput text-black dark:text-white'
             }`}
           >
             {message.content}
@@ -40,7 +40,7 @@ const MessageList: React.FC = () => {
 
       {isLoading && (
         <div className="flex justify-start">
-          <div className="max-w-[80%] p-3 rounded-lg bg-lofty-gray">
+          <div className="max-w-[80%] p-3 rounded-lg bg-lofty-gray dark:bg-lofty-darkInput">
             <div className="flex space-x-1">
               <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse"></div>
               <div className="w-2 h-2 rounded-full bg-gray-500 animate-pulse" style={{ animationDelay: '0.2s' }}></div>
