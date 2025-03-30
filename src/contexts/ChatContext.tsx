@@ -1,184 +1,169 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 
-type Message = {
+type MessageRole = 'user' | 'assistant';
+
+interface Message {
   id: string;
+  role: MessageRole;
   content: string;
-  role: 'user' | 'assistant';
-  timestamp: Date;
-};
+  attachments?: any[]; // For file attachments
+}
 
-type ChatSession = {
+interface Session {
   id: string;
   title: string;
   messages: Message[];
-  createdAt: Date;
-  updatedAt: Date;
-};
+}
 
 interface ChatContextType {
-  currentSession: ChatSession | null;
-  sessions: ChatSession[];
   messages: Message[];
+  sessions: Session[];
+  currentSession: string | null;
   isLoading: boolean;
-  selectedModel: string;
+  sendMessage: (content: string, attachments?: File[]) => Promise<void>;
   createNewChat: () => void;
-  sendMessage: (content: string) => Promise<void>;
-  setSelectedModel: (model: string) => void;
   selectSession: (sessionId: string) => void;
+  deleteSession: (sessionId: string) => void;
 }
+
+const defaultSessions: Session[] = [
+  {
+    id: '1',
+    title: 'Previous chat 1',
+    messages: []
+  },
+  {
+    id: '2',
+    title: 'Previous chat 2',
+    messages: []
+  }
+];
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
-export const useChat = () => {
-  const context = useContext(ChatContext);
-  if (!context) {
-    throw new Error('useChat must be used within a ChatProvider');
-  }
-  return context;
-};
-
-interface ChatProviderProps {
-  children: ReactNode;
-}
-
-export const ChatProvider = ({ children }: ChatProviderProps) => {
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [currentSession, setCurrentSession] = useState<ChatSession | null>(null);
+export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [sessions, setSessions] = useState<Session[]>(defaultSessions);
+  const [currentSession, setCurrentSession] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedModel, setSelectedModel] = useState('baby-orchestrator');
 
-  // Load sessions from localStorage on initial render
-  useEffect(() => {
-    const savedSessions = localStorage.getItem('chatSessions');
-    const savedCurrentSessionId = localStorage.getItem('currentSessionId');
-    
-    if (savedSessions) {
-      const parsedSessions = JSON.parse(savedSessions).map((session: any) => ({
-        ...session,
-        createdAt: new Date(session.createdAt),
-        updatedAt: new Date(session.updatedAt),
-        messages: session.messages.map((msg: any) => ({
-          ...msg,
-          timestamp: new Date(msg.timestamp)
-        }))
-      }));
-      
-      setSessions(parsedSessions);
-      
-      if (savedCurrentSessionId) {
-        const currentSession = parsedSessions.find((s: ChatSession) => s.id === savedCurrentSessionId);
-        if (currentSession) {
-          setCurrentSession(currentSession);
-        }
-      } else if (parsedSessions.length > 0) {
-        setCurrentSession(parsedSessions[0]);
-      }
-    }
-  }, []);
-
-  // Save sessions to localStorage whenever they change
-  useEffect(() => {
-    if (sessions.length > 0) {
-      localStorage.setItem('chatSessions', JSON.stringify(sessions));
-    }
-    if (currentSession) {
-      localStorage.setItem('currentSessionId', currentSession.id);
-    }
-  }, [sessions, currentSession]);
+  // Get current messages based on the active session
+  const messages = currentSession 
+    ? sessions.find(s => s.id === currentSession)?.messages || []
+    : [];
 
   const createNewChat = () => {
-    const newSession: ChatSession = {
-      id: `session-${Date.now()}`,
-      title: `New Chat ${sessions.length + 1}`,
-      messages: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
+    const newSession: Session = {
+      id: uuidv4(),
+      title: `New chat ${sessions.length + 1}`,
+      messages: []
     };
     
-    setSessions([newSession, ...sessions]);
-    setCurrentSession(newSession);
+    setSessions(prev => [...prev, newSession]);
+    setCurrentSession(newSession.id);
   };
 
   const selectSession = (sessionId: string) => {
-    const session = sessions.find(s => s.id === sessionId);
-    if (session) {
-      setCurrentSession(session);
+    setCurrentSession(sessionId);
+  };
+
+  const deleteSession = (sessionId: string) => {
+    setSessions(prev => prev.filter(session => session.id !== sessionId));
+    
+    // If we deleted the current session, set current to null
+    if (currentSession === sessionId) {
+      setCurrentSession(null);
     }
   };
 
-  const updateSession = (updatedSession: ChatSession) => {
-    const updatedSessions = sessions.map(session => 
-      session.id === updatedSession.id ? updatedSession : session
-    );
+  const sendMessage = async (content: string, attachments: File[] = []) => {
+    if (!content.trim() && attachments.length === 0) return;
     
-    setSessions(updatedSessions);
-    setCurrentSession(updatedSession);
-  };
-
-  const sendMessage = async (content: string) => {
+    // Create session if none exists
     if (!currentSession) {
       createNewChat();
     }
     
+    // Add user message
+    const userMessage: Message = {
+      id: uuidv4(),
+      role: 'user',
+      content,
+      attachments: attachments.map(file => ({
+        name: file.name,
+        type: file.type,
+        size: file.size
+      }))
+    };
+    
+    setSessions(prev => {
+      return prev.map(session => {
+        if (session.id === currentSession) {
+          return {
+            ...session,
+            messages: [...session.messages, userMessage]
+          };
+        }
+        return session;
+      });
+    });
+    
+    // Simulate assistant response
     setIsLoading(true);
     
-    // Create user message
-    const userMessage: Message = {
-      id: `msg-${Date.now()}`,
-      content,
-      role: 'user',
-      timestamp: new Date()
-    };
-    
-    // Add user message to the current session
-    const updatedSession = currentSession ? {
-      ...currentSession,
-      messages: [...currentSession.messages, userMessage],
-      updatedAt: new Date()
-    } : {
-      id: `session-${Date.now()}`,
-      title: content.slice(0, 30) + (content.length > 30 ? '...' : ''),
-      messages: [userMessage],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-    
-    updateSession(updatedSession as ChatSession);
-    
-    // Simulate API call with setTimeout
-    setTimeout(() => {
-      // Create assistant message
+    try {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Add assistant response
       const assistantMessage: Message = {
-        id: `msg-${Date.now() + 1}`,
-        content: `This is a simulated response to: "${content}"`,
+        id: uuidv4(),
         role: 'assistant',
-        timestamp: new Date()
+        content: `This is a response to: "${content}"`
       };
       
-      // Add assistant message to the current session
-      const sessionWithResponse = {
-        ...updatedSession,
-        messages: [...updatedSession.messages, assistantMessage],
-        updatedAt: new Date()
-      };
-      
-      updateSession(sessionWithResponse as ChatSession);
+      setSessions(prev => {
+        return prev.map(session => {
+          if (session.id === currentSession) {
+            // Update session title based on first message if it's a new chat
+            const isFirstMessage = session.messages.length <= 1;
+            return {
+              ...session,
+              title: isFirstMessage ? content.slice(0, 30) + (content.length > 30 ? '...' : '') : session.title,
+              messages: [...session.messages, assistantMessage]
+            };
+          }
+          return session;
+        });
+      });
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
-  const value = {
-    currentSession,
-    sessions,
-    messages: currentSession?.messages || [],
-    isLoading,
-    selectedModel,
-    createNewChat,
-    sendMessage,
-    setSelectedModel,
-    selectSession
-  };
-  
-  return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
+  return (
+    <ChatContext.Provider 
+      value={{ 
+        messages, 
+        sessions, 
+        currentSession, 
+        isLoading, 
+        sendMessage, 
+        createNewChat, 
+        selectSession,
+        deleteSession
+      }}
+    >
+      {children}
+    </ChatContext.Provider>
+  );
+};
+
+export const useChat = () => {
+  const context = useContext(ChatContext);
+  if (context === undefined) {
+    throw new Error('useChat must be used within a ChatProvider');
+  }
+  return context;
 };

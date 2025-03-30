@@ -2,9 +2,29 @@
 import React from 'react';
 import { useChat } from '@/contexts/ChatContext';
 import Logo from './Logo';
+import { FileIcon, Paperclip } from 'lucide-react';
 
 const MessageList: React.FC = () => {
   const { messages, isLoading } = useChat();
+
+  // Function to render file attachments
+  const renderAttachments = (attachments: any[]) => {
+    if (!attachments || attachments.length === 0) return null;
+    
+    return (
+      <div className="flex flex-wrap gap-2 mt-2">
+        {attachments.map((file, index) => (
+          <div 
+            key={index}
+            className="bg-gray-100 dark:bg-lofty-darkInput/70 text-black dark:text-white rounded-md px-3 py-1.5 flex items-center gap-2 text-sm"
+          >
+            <FileIcon size={14} />
+            <span className="truncate max-w-[120px]">{file.name || 'File'}</span>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   // If no messages, show welcome screen
   if (messages.length === 0) {
@@ -34,6 +54,7 @@ const MessageList: React.FC = () => {
             }`}
           >
             {message.content}
+            {message.attachments && renderAttachments(message.attachments)}
           </div>
         </div>
       ))}
