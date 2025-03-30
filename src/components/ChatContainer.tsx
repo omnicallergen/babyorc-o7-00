@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import ModelSelector from './ModelSelector';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
@@ -18,9 +18,9 @@ const ChatContainer: React.FC = () => {
   };
 
   return (
-    <div className="h-screen flex-1 flex flex-col">
+    <div className="h-screen flex-1 flex flex-col bg-white dark:bg-gray-900 dark:text-white">
       {/* Header */}
-      <div className="border-b border-lofty-border p-4 flex justify-between items-center">
+      <div className="border-b border-lofty-border dark:border-gray-700 p-4 flex justify-between items-center">
         <ModelSelector />
         <Logo size="small" />
       </div>
@@ -29,7 +29,7 @@ const ChatContainer: React.FC = () => {
       <MessageList />
 
       {/* Input section */}
-      <div className="border-t border-lofty-border mt-auto">
+      <div className="border-t border-lofty-border dark:border-gray-700 mt-auto">
         <ChatInput onToolSelect={handleToolSelect} />
       </div>
     </div>
