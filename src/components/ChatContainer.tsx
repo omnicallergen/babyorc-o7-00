@@ -1,20 +1,26 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import ModelSelector from './ModelSelector';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
 import Logo from './Logo';
 import { useToast } from '@/hooks/use-toast';
+import DocumentVerifier from './DocumentVerifier';
 
 const ChatContainer: React.FC = () => {
   const { toast } = useToast();
+  const [isDocumentVerifierOpen, setIsDocumentVerifierOpen] = useState(false);
   
   const handleToolSelect = (tool: string) => {
-    toast({
-      title: `Tool selected: ${tool}`,
-      description: "This feature is coming soon!",
-      duration: 3000,
-    });
+    if (tool === 'verify document') {
+      setIsDocumentVerifierOpen(true);
+    } else {
+      toast({
+        title: `Tool selected: ${tool}`,
+        description: "This feature is coming soon!",
+        duration: 3000,
+      });
+    }
   };
 
   return (
@@ -32,6 +38,12 @@ const ChatContainer: React.FC = () => {
       <div className="border-t border-lofty-border dark:border-lofty-darkBorder mt-auto">
         <ChatInput onToolSelect={handleToolSelect} />
       </div>
+
+      {/* Document Verifier Tool */}
+      <DocumentVerifier 
+        isOpen={isDocumentVerifierOpen} 
+        onClose={() => setIsDocumentVerifierOpen(false)} 
+      />
     </div>
   );
 };
