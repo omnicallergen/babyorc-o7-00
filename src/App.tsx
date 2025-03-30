@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import ProfileSettings from "./pages/ProfileSettings";
+import SystemConfig from "./pages/SystemConfig";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
 import { UserProvider } from "./contexts/UserContext";
@@ -25,6 +26,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/settings" element={<ProfileSettings />} />
+              <Route path="/system" element={<SystemConfig />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

@@ -1,6 +1,13 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+type SystemPromptSettings = {
+  prompt: string;
+  temperature: number;
+  maxTokens: number;
+  autoSave: boolean;
+};
+
 type UserProfile = {
   name: string;
   avatar?: string;
@@ -21,10 +28,12 @@ type UserProfile = {
 interface UserContextType {
   user: UserProfile;
   darkMode: boolean;
+  systemPromptSettings: SystemPromptSettings | null;
   toggleDarkMode: () => void;
   updateUserProfile: (profile: Partial<UserProfile>) => void;
   updateNotificationSettings: (settings: Partial<UserProfile['notificationSettings']>) => void;
   updateSecuritySettings: (settings: Partial<UserProfile['securitySettings']>) => void;
+  updateSystemPrompt: (settings: SystemPromptSettings) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -60,10 +69,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   
   const [darkMode, setDarkMode] = useState(false);
   
+  const [systemPromptSettings, setSystemPromptSettings] = useState<SystemPromptSettings>({
+    prompt: 'You are go:lofty, an AI assistant specialized in consulting. Provide helpful, accurate, and concise advice.',
+    temperature: 0.7,
+    maxTokens: 1024,
+    autoSave: false
+  });
+  
   // Load user preferences from localStorage on initial render
   useEffect(() => {
     const savedUser = localStorage.getItem('userProfile');
     const savedDarkMode = localStorage.getItem('darkMode');
+    const savedSystemPrompt = localStorage.getItem('systemPromptSettings');
     
     if (savedUser) {
       setUser(JSON.parse(savedUser));
@@ -71,6 +88,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     
     if (savedDarkMode !== null) {
       setDarkMode(JSON.parse(savedDarkMode));
+    }
+    
+    if (savedSystemPrompt) {
+      setSystemPromptSettings(JSON.parse(savedSystemPrompt));
     }
   }, []);
   
@@ -117,13 +138,20 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     });
   };
   
+  const updateSystemPrompt = (settings: SystemPromptSettings) => {
+    setSystemPromptSettings(settings);
+    localStorage.setItem('systemPromptSettings', JSON.stringify(settings));
+  };
+  
   const value = {
     user,
     darkMode,
+    systemPromptSettings,
     toggleDarkMode,
     updateUserProfile,
     updateNotificationSettings,
-    updateSecuritySettings
+    updateSecuritySettings,
+    updateSystemPrompt
   };
   
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;

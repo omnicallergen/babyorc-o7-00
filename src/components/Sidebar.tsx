@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp } from 'lucide-react';
+import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp, Cpu } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
 import Logo from './Logo';
@@ -126,6 +126,15 @@ const Sidebar: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Divider */}
+      <div className="border-t border-lofty-border dark:border-lofty-darkBorder"></div>
+
+      {/* System configuration link */}
+      <Link to="/system" className="p-3 flex items-center space-x-2 hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/50 text-black dark:text-white">
+        <Cpu size={16} />
+        <span>System Configuration</span>
+      </Link>
 
       {/* Divider */}
       <div className="border-t border-lofty-border dark:border-lofty-darkBorder"></div>

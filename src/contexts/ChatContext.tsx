@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
+import { useUser } from './UserContext';
 
 type MessageRole = 'user' | 'assistant';
 
@@ -55,6 +56,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isLoading, setIsLoading] = useState(false);
   const [selectedModel, setSelectedModel] = useState<string>('baby-orchestrator');
   const { toast } = useToast();
+  const { systemPromptSettings } = useUser();
 
   // Get current messages based on the active session
   const messages = currentSession 
@@ -164,6 +166,11 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       // Simulate network delay
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // In a real implementation, we would use the systemPromptSettings here
+      console.log("Using system prompt:", systemPromptSettings?.prompt);
+      console.log("Using temperature:", systemPromptSettings?.temperature);
+      console.log("Using max tokens:", systemPromptSettings?.maxTokens);
       
       // Add assistant response
       const assistantMessage: Message = {
