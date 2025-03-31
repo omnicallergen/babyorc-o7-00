@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '@/contexts/UserContext';
@@ -63,7 +62,6 @@ const SystemConfig: React.FC = () => {
     systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro'
   );
 
-  // Complete list of available Gemini models
   const geminiModels = [
     { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
     { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
@@ -72,12 +70,16 @@ const SystemConfig: React.FC = () => {
     { id: 'gemini-1.0-pro-latest', name: 'Gemini 1.0 Pro Latest' },
     { id: 'gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro Latest' },
     { id: 'gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash Latest' },
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help' },
+    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning' },
+    { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports' },
+    { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history' },
+    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks' },
     { id: 'gemini-ultra', name: 'Gemini Ultra' },
     { id: 'gemini-1.5-flash-preview', name: 'Gemini 1.5 Flash Preview' },
     { id: 'gemini-1.5-pro-preview', name: 'Gemini 1.5 Pro Preview' }
   ];
 
-  // Auto save when enabled
   useEffect(() => {
     if (autoSaveEnabled) {
       const timer = setTimeout(() => {
@@ -137,7 +139,6 @@ const SystemConfig: React.FC = () => {
         </h1>
         
         <div className="space-y-6">
-          {/* Gemini API Configuration Section */}
           <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Bot size={20} />
@@ -201,8 +202,11 @@ const SystemConfig: React.FC = () => {
                 </SelectTrigger>
                 <SelectContent>
                   {geminiModels.map((model) => (
-                    <SelectItem key={model.id} value={model.id}>
-                      {model.name}
+                    <SelectItem key={model.id} value={model.id} className="flex flex-col items-start">
+                      <div>{model.name}</div>
+                      {model.description && (
+                        <div className="text-xs text-muted-foreground">{model.description}</div>
+                      )}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -215,7 +219,6 @@ const SystemConfig: React.FC = () => {
           
           <Separator />
           
-          {/* System Prompt Section */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Label htmlFor="systemPrompt" className="text-lg">System Prompt</Label>

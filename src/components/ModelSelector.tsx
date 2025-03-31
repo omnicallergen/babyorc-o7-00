@@ -9,13 +9,15 @@ const ModelSelector: React.FC = () => {
 
   const models = [
     { id: 'baby-orchestrator', name: 'baby-orchestrator', disabled: false },
-    { id: 'baby-validator', name: 'baby-validator', disabled: true }
+    { id: 'baby-validator', name: 'baby-validator', disabled: true },
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', disabled: true, description: 'Get everyday help' },
+    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking', disabled: true, description: 'Uses advanced reasoning' },
   ];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
   const selectModel = (modelId: string) => {
-    if (modelId !== 'baby-validator') {
+    if (!models.find(model => model.id === modelId)?.disabled) {
       setSelectedModel(modelId);
     }
     setIsOpen(false);
@@ -37,17 +39,22 @@ const ModelSelector: React.FC = () => {
             {models.map((model) => (
               <li key={model.id}>
                 <button
-                  className={`flex w-full items-center justify-between px-4 py-2 text-left
+                  className={`flex flex-col w-full items-start px-4 py-2 text-left
                     ${model.disabled 
                       ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
                       : 'hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/70 dark:text-white'
                     }
                   `}
-                  onClick={() => !model.disabled && selectModel(model.id)}
+                  onClick={() => selectModel(model.id)}
                   disabled={model.disabled}
                 >
-                  <span>{model.name}</span>
-                  {selectedModel === model.id && <Check size={16} />}
+                  <span className="flex items-center justify-between w-full">
+                    <span>{model.name}</span>
+                    {selectedModel === model.id && <Check size={16} />}
+                  </span>
+                  {model.description && (
+                    <span className="text-xs text-muted-foreground">{model.description}</span>
+                  )}
                 </button>
               </li>
             ))}
