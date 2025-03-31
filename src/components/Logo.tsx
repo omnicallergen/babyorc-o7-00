@@ -29,70 +29,29 @@ const Logo: React.FC<LogoProps> = ({
     return (
       <div className={`relative ${sizes[size]} ${className}`}>
         <svg 
-          viewBox="0 0 100 100" 
+          viewBox="0 0 42 49" 
           className="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
+          xmlnsXlink="http://www.w3.org/1999/xlink"
         >
-          {/* Top cube - Blue gradient */}
-          <path 
-            d="M20 20 L50 35 L80 20 L50 5 Z" 
-            fill="url(#blueGradient)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Middle face of top cube */}
-          <path 
-            d="M20 20 L20 40 L50 55 L50 35 Z" 
-            fill="url(#blueGradientLight)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Right face of top cube */}
-          <path 
-            d="M50 35 L50 55 L80 40 L80 20 Z" 
-            fill="url(#blueGradientDark)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Bottom cube - Light blue */}
-          <path 
-            d="M20 40 L50 55 L80 40 L50 25 Z" 
-            fill="#D6E8FF" 
-            opacity="0.7"
-            className="drop-shadow-sm"
-          />
-          
-          {/* Middle face of bottom cube */}
-          <path 
-            d="M20 40 L20 60 L50 75 L50 55 Z" 
-            fill="#C5E0FF" 
-            opacity="0.6"
-            className="drop-shadow-sm"
-          />
-          
-          {/* Right face of bottom cube */}
-          <path 
-            d="M50 55 L50 75 L80 60 L80 40 Z" 
-            fill="#B3D7FF" 
-            opacity="0.6"
-            className="drop-shadow-sm"
-          />
-
-          {/* Define gradients */}
-          <defs>
-            <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#2B8EFF" />
-              <stop offset="100%" stopColor="#7CD4FD" />
-            </linearGradient>
-            <linearGradient id="blueGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3E97FF" />
-              <stop offset="100%" stopColor="#6ACFFE" />
-            </linearGradient>
-            <linearGradient id="blueGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1F85FA" />
-              <stop offset="100%" stopColor="#55C5FC" />
-            </linearGradient>
-          </defs>
+          <g>
+            <path fillRule="evenodd" clipRule="evenodd" d="M37.5,38.3c4-2.5,4.2-8.2,0.4-11l-12.3-8.9c-2.2-1.6-5.1-1.7-7.3-0.3L4.5,26.5c-4,2.5-4.2,8.2-0.4,11
+              l12.3,8.9c2.2,1.6,5.1,1.7,7.3,0.3L37.5,38.3z M22.8,45.2l13.8-8.5c2.9-1.8,3.1-6,0.3-8l-12.3-8.9c-1.6-1.2-3.7-1.2-5.4-0.2L5.4,28
+              c-2.9,1.8-3.1,6-0.3,8L17.4,45C19,46.2,21.1,46.3,22.8,45.2z"/>
+            <path fill="#C0EAFD" d="M37.9,20.1c3.8,2.8,3.6,8.5-0.4,11l-13.8,8.5c-2.3,1.4-5.2,1.3-7.3-0.3L4.1,30.3c-3.8-2.8-3.6-8.5,0.4-11
+              l13.8-8.5c2.3-1.4,5.2-1.3,7.3,0.3L37.9,20.1z"/>
+            <g>
+              <g>
+                <clipPath id="SVGID_2_">
+                  <path d="M37.9,11.5c3.8,2.8,3.6,8.5-0.4,11l-13.8,8.5c-2.3,1.4-5.2,1.3-7.3-0.3L4.1,21.7c-3.8-2.8-3.6-8.5,0.4-11
+                    l13.8-8.5c2.3-1.4,5.2-1.3,7.3,0.3L37.9,11.5z"/>
+                </clipPath>
+                <g clipPath="url(#SVGID_2_)">
+                  <rect x="-3.6" y="-3.7" width="49.3" height="40.6" fill="#2B8EFF" />
+                </g>
+              </g>
+            </g>
+          </g>
         </svg>
       </div>
     );
@@ -103,70 +62,29 @@ const Logo: React.FC<LogoProps> = ({
     <div className={`flex items-center ${className}`}>
       <div className={`relative ${sizes[size]}`}>
         <svg 
-          viewBox="0 0 100 100" 
+          viewBox="0 0 42 49" 
           className="w-full h-full"
           xmlns="http://www.w3.org/2000/svg"
+          xmlnsXlink="http://www.w3.org/1999/xlink"
         >
-          {/* Top cube - Blue gradient */}
-          <path 
-            d="M20 20 L50 35 L80 20 L50 5 Z" 
-            fill="url(#blueGradient)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Middle face of top cube */}
-          <path 
-            d="M20 20 L20 40 L50 55 L50 35 Z" 
-            fill="url(#blueGradientLight)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Right face of top cube */}
-          <path 
-            d="M50 35 L50 55 L80 40 L80 20 Z" 
-            fill="url(#blueGradientDark)" 
-            className="drop-shadow-md"
-          />
-          
-          {/* Bottom cube - Light blue */}
-          <path 
-            d="M20 40 L50 55 L80 40 L50 25 Z" 
-            fill="#D6E8FF" 
-            opacity="0.7"
-            className="drop-shadow-sm"
-          />
-          
-          {/* Middle face of bottom cube */}
-          <path 
-            d="M20 40 L20 60 L50 75 L50 55 Z" 
-            fill="#C5E0FF" 
-            opacity="0.6"
-            className="drop-shadow-sm"
-          />
-          
-          {/* Right face of bottom cube */}
-          <path 
-            d="M50 55 L50 75 L80 60 L80 40 Z" 
-            fill="#B3D7FF" 
-            opacity="0.6"
-            className="drop-shadow-sm"
-          />
-
-          {/* Define gradients */}
-          <defs>
-            <linearGradient id="blueGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#2B8EFF" />
-              <stop offset="100%" stopColor="#7CD4FD" />
-            </linearGradient>
-            <linearGradient id="blueGradientLight" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#3E97FF" />
-              <stop offset="100%" stopColor="#6ACFFE" />
-            </linearGradient>
-            <linearGradient id="blueGradientDark" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#1F85FA" />
-              <stop offset="100%" stopColor="#55C5FC" />
-            </linearGradient>
-          </defs>
+          <g>
+            <path fillRule="evenodd" clipRule="evenodd" d="M37.5,38.3c4-2.5,4.2-8.2,0.4-11l-12.3-8.9c-2.2-1.6-5.1-1.7-7.3-0.3L4.5,26.5c-4,2.5-4.2,8.2-0.4,11
+              l12.3,8.9c2.2,1.6,5.1,1.7,7.3,0.3L37.5,38.3z M22.8,45.2l13.8-8.5c2.9-1.8,3.1-6,0.3-8l-12.3-8.9c-1.6-1.2-3.7-1.2-5.4-0.2L5.4,28
+              c-2.9,1.8-3.1,6-0.3,8L17.4,45C19,46.2,21.1,46.3,22.8,45.2z"/>
+            <path fill="#C0EAFD" d="M37.9,20.1c3.8,2.8,3.6,8.5-0.4,11l-13.8,8.5c-2.3,1.4-5.2,1.3-7.3-0.3L4.1,30.3c-3.8-2.8-3.6-8.5,0.4-11
+              l13.8-8.5c2.3-1.4,5.2-1.3,7.3,0.3L37.9,20.1z"/>
+            <g>
+              <g>
+                <clipPath id="SVGID_2_">
+                  <path d="M37.9,11.5c3.8,2.8,3.6,8.5-0.4,11l-13.8,8.5c-2.3,1.4-5.2,1.3-7.3-0.3L4.1,21.7c-3.8-2.8-3.6-8.5,0.4-11
+                    l13.8-8.5c2.3-1.4,5.2-1.3,7.3,0.3L37.9,11.5z"/>
+                </clipPath>
+                <g clipPath="url(#SVGID_2_)">
+                  <rect x="-3.6" y="-3.7" width="49.3" height="40.6" fill="#2B8EFF" />
+                </g>
+              </g>
+            </g>
+          </g>
         </svg>
       </div>
       <div className={`ml-2 ${size === 'small' ? 'text-sm' : size === 'large' ? 'text-xl' : 'text-base'}`}>

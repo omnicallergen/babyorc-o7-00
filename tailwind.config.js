@@ -11,7 +11,7 @@ export default {
       colors: {
         lofty: {
           blue: '#2B8EFF',
-          lightblue: '#7CD4FD',
+          lightblue: '#C0EAFD',
           gray: '#F1F1F5',
           darkgray: '#8E9196',
           border: '#E5E5E5',
