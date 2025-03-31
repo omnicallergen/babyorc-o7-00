@@ -46,13 +46,12 @@ const Sidebar: React.FC = () => {
   return (
     <div className="h-screen w-full max-w-[250px] border-r border-lofty-border dark:border-lofty-darkBorder dark:bg-lofty-darkBg flex flex-col">
       {/* Header */}
-      <div className="p-4 flex items-center space-x-2 text-black dark:text-white">
-        <FileText size={18} />
-        <h1 className="font-semibold">GenAI for Consulting</h1>
+      <div className="p-4 flex flex-col items-center space-y-2 border-b border-lofty-border dark:border-lofty-darkBorder">
+        <Link to="/" className="w-full">
+          <Logo size="medium" className="mx-auto" />
+        </Link>
+        <h1 className="font-medium text-sm text-center text-black dark:text-white">GenAI for Consulting</h1>
       </div>
-
-      {/* Divider */}
-      <div className="border-b border-lofty-border dark:border-lofty-darkBorder"></div>
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto p-2 flex flex-col space-y-2">

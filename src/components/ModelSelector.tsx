@@ -69,18 +69,18 @@ const ModelSelector: React.FC = () => {
   return (
     <div className="relative">
       <button
-        className="inline-flex items-center justify-between gap-2 px-4 py-2 border border-lofty-border dark:border-lofty-darkBorder rounded-full focus:outline-none min-w-[220px] dark:bg-lofty-darkInput dark:text-white"
+        className="inline-flex items-center justify-between gap-2 px-4 py-2 border border-lofty-border dark:border-lofty-darkBorder rounded-full focus:outline-none min-w-[220px] dark:bg-lofty-darkInput dark:text-white hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/80 transition-colors"
         onClick={toggleDropdown}
       >
         <span className="flex items-center gap-2">
           {currentModel.id.includes('gemini') ? (
             <Sparkles size={16} className="text-lofty-blue" />
           ) : (
-            <Bot size={16} className="text-lofty-green" />
+            <Bot size={16} className="text-blue-500" />
           )}
           <span>{currentModel.name}</span>
         </span>
-        <ChevronDown size={16} />
+        <ChevronDown size={16} className={`transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -100,6 +100,7 @@ const ModelSelector: React.FC = () => {
                             ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
                             : 'hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/70 dark:text-white'
                           }
+                          ${selectedModel === model.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
                         `}
                         onClick={() => selectModel(model.id)}
                         disabled={model.disabled}
@@ -107,10 +108,10 @@ const ModelSelector: React.FC = () => {
                       >
                         <span className="flex items-center justify-between w-full">
                           <span className="flex items-center gap-1.5">
-                            <Bot size={14} className={model.disabled ? 'text-gray-400' : 'text-lofty-green'} />
+                            <Bot size={14} className={model.disabled ? 'text-gray-400' : 'text-blue-500'} />
                             {model.name}
                           </span>
-                          {selectedModel === model.id && <Check size={16} />}
+                          {selectedModel === model.id && <Check size={16} className="text-blue-500" />}
                         </span>
                         {model.description && (
                           <span className="text-xs text-muted-foreground">{model.description}</span>
@@ -149,6 +150,7 @@ const ModelSelector: React.FC = () => {
                         ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
                         : 'hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/70 dark:text-white'
                       }
+                      ${selectedModel === model.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
                     `}
                     onClick={() => selectModel(model.id)}
                     disabled={model.disabled}
@@ -156,10 +158,10 @@ const ModelSelector: React.FC = () => {
                   >
                     <span className="flex items-center justify-between w-full">
                       <span className="flex items-center gap-1.5">
-                        <Sparkles size={14} className={model.disabled ? 'text-gray-400' : 'text-lofty-blue'} />
+                        <Sparkles size={14} className={model.disabled ? 'text-gray-400' : 'text-blue-500'} />
                         {model.name}
                       </span>
-                      {selectedModel === model.id && <Check size={16} />}
+                      {selectedModel === model.id && <Check size={16} className="text-blue-500" />}
                     </span>
                     {model.description && (
                       <span className="text-xs text-muted-foreground">{model.description}</span>

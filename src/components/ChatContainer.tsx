@@ -28,7 +28,7 @@ const ChatContainer: React.FC = () => {
       {/* Header */}
       <div className="border-b border-lofty-border dark:border-lofty-darkBorder p-4 flex justify-between items-center">
         <ModelSelector />
-        <Logo size="small" />
+        <Logo size="small" className="transition-transform hover:scale-110 duration-300" />
       </div>
 
       {/* Message list */}

@@ -2,7 +2,7 @@
 import React from 'react';
 import { useChat } from '@/contexts/ChatContext';
 import Logo from './Logo';
-import { FileIcon, Paperclip } from 'lucide-react';
+import { FileIcon } from 'lucide-react';
 
 const MessageList: React.FC = () => {
   const { messages, isLoading } = useChat();
@@ -30,10 +30,29 @@ const MessageList: React.FC = () => {
   if (messages.length === 0) {
     return (
       <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="flex flex-col items-center space-y-4">
-          <Logo size="medium" />
+        <div className="flex flex-col items-center space-y-6">
+          <Logo size="large" className="animate-pulse duration-3000" />
           <h1 className="text-3xl font-bold dark:text-white">go:lofty</h1>
           <p className="text-xl dark:text-gray-300">How can I help you today?</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4 max-w-2xl px-4">
+            <div className="p-4 bg-lofty-gray/60 dark:bg-lofty-darkInput rounded-lg hover:bg-lofty-gray dark:hover:bg-lofty-darkInput/80 transition-all cursor-pointer">
+              <h3 className="text-lg font-medium mb-1">Analyze a Document</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Verify alignment with business strategy</p>
+            </div>
+            <div className="p-4 bg-lofty-gray/60 dark:bg-lofty-darkInput rounded-lg hover:bg-lofty-gray dark:hover:bg-lofty-darkInput/80 transition-all cursor-pointer">
+              <h3 className="text-lg font-medium mb-1">Create a Presentation</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Build professional slide decks</p>
+            </div>
+            <div className="p-4 bg-lofty-gray/60 dark:bg-lofty-darkInput rounded-lg hover:bg-lofty-gray dark:hover:bg-lofty-darkInput/80 transition-all cursor-pointer">
+              <h3 className="text-lg font-medium mb-1">Market Analysis</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Get insights on market trends</p>
+            </div>
+            <div className="p-4 bg-lofty-gray/60 dark:bg-lofty-darkInput rounded-lg hover:bg-lofty-gray dark:hover:bg-lofty-darkInput/80 transition-all cursor-pointer">
+              <h3 className="text-lg font-medium mb-1">Strategic Planning</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Develop business strategies</p>
+            </div>
+          </div>
         </div>
       </div>
     );
