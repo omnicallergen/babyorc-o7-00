@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp, Cpu } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
-import Logo from './Logo';
 import { Link } from 'react-router-dom';
 import { 
   DropdownMenu,
@@ -45,12 +44,11 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="h-screen w-full max-w-[250px] border-r border-lofty-border dark:border-lofty-darkBorder dark:bg-lofty-darkBg flex flex-col">
-      {/* Header */}
+      {/* Header - Removed the Logo component, only showing the text */}
       <div className="p-4 flex flex-col items-center space-y-2 border-b border-lofty-border dark:border-lofty-darkBorder">
         <Link to="/" className="w-full">
-          <Logo size="medium" className="mx-auto" />
+          <h1 className="font-medium text-center text-black dark:text-white">GenAI for Consulting</h1>
         </Link>
-        <h1 className="font-medium text-sm text-center text-black dark:text-white">GenAI for Consulting</h1>
       </div>
 
       {/* Main content */}

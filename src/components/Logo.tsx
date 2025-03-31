@@ -57,7 +57,7 @@ const Logo: React.FC<LogoProps> = ({
     );
   }
 
-  // Full logo with text
+  // Full logo with text but now with icon on the left side of the text
   return (
     <div className={`flex items-center ${className}`}>
       <div className={`relative ${sizes[size]}`}>
