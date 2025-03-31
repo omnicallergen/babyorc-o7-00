@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp, Cpu } from 'lucide-react';
+import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp, Cpu, Brain } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
 import { Link } from 'react-router-dom';
@@ -44,10 +44,13 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="h-screen w-full max-w-[250px] border-r border-lofty-border dark:border-lofty-darkBorder dark:bg-lofty-darkBg flex flex-col">
-      {/* Header - Removed the Logo component, only showing the text */}
+      {/* Header - Now with Brain icon beside the text */}
       <div className="p-4 flex flex-col items-center space-y-2 border-b border-lofty-border dark:border-lofty-darkBorder">
         <Link to="/" className="w-full">
-          <h1 className="font-medium text-center text-black dark:text-white">GenAI for Consulting</h1>
+          <h1 className="font-medium text-center text-black dark:text-white flex items-center justify-center gap-2">
+            <Brain size={20} className="text-lofty-darkgray dark:text-white" />
+            GenAI for Consulting
+          </h1>
         </Link>
       </div>
 
