@@ -10,7 +10,7 @@ interface LogoProps {
 const Logo: React.FC<LogoProps> = ({ 
   size = 'medium', 
   className = '',
-  showText = true
+  showText = false // Changed default to false
 }) => {
   const sizes = {
     small: 'w-6 h-6',
@@ -24,7 +24,7 @@ const Logo: React.FC<LogoProps> = ({
     large: 'w-36'
   };
 
-  // If showing just the icon without text
+  // If not showing text, just return the icon
   if (!showText) {
     return (
       <div className={`relative ${sizes[size]} ${className}`}>
@@ -57,7 +57,7 @@ const Logo: React.FC<LogoProps> = ({
     );
   }
 
-  // Full logo with text but now with icon on the left side of the text
+  // Full logo with text if showText is true
   return (
     <div className={`flex items-center ${className}`}>
       <div className={`relative ${sizes[size]}`}>
