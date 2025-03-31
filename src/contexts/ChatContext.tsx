@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
@@ -184,7 +185,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       console.log("Using system prompt:", prompt);
       console.log("Using temperature:", temperature);
       console.log("Using max tokens:", maxTokens);
-      console.log("Using model:", modelToUse);
+      console.log("Using model:", selectedModel);
       
       let responseText = '';
       
@@ -193,7 +194,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         responseText = await sendMessageToGemini(
           formattedMessages,
           apiKey,
-          modelToUse,
+          selectedModel,
           temperature,
           maxTokens
         );
