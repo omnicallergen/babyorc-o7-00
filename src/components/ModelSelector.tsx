@@ -39,13 +39,8 @@ const ModelSelector: React.FC = () => {
   const apiKeyAvailable = !!systemPromptSettings?.geminiApiKey;
   
   // Combine models, making Gemini models disabled if no API key is available
-  const models: ModelOption[] = [
-    ...defaultModels,
-    ...geminiModels.map(model => ({
-      ...model, 
-      disabled: !apiKeyAvailable
-    }))
-  ];
+  // We only show default models in the dropdown, not the Gemini models
+  const models: ModelOption[] = [...defaultModels];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
 
@@ -58,9 +53,7 @@ const ModelSelector: React.FC = () => {
   
   // Show a tooltip hint if hovering over a disabled model
   const getDisabledMessage = (model: ModelOption) => {
-    return model.disabled && !apiKeyAvailable 
-      ? "Add Gemini API key in System Configuration to use this model" 
-      : "";
+    return model.disabled ? "This model is not available yet" : "";
   };
   
   // Get the current model's info
@@ -123,53 +116,7 @@ const ModelSelector: React.FC = () => {
               </>
             )}
             
-            <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase flex items-center justify-between">
-              <span>Gemini Models</span>
-              {!apiKeyAvailable && (
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info size={14} className="text-gray-400 cursor-help" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-[200px] text-xs">
-                        Add your Gemini API key in System Configuration to enable these models.
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              )}
-            </div>
-            
-            <ul className="py-1">
-              {geminiModels.map((model) => (
-                <li key={model.id}>
-                  <button
-                    className={`flex flex-col w-full items-start px-4 py-2 text-left
-                      ${model.disabled 
-                        ? 'text-gray-400 dark:text-gray-500 cursor-not-allowed' 
-                        : 'hover:bg-lofty-gray/50 dark:hover:bg-lofty-darkInput/70 dark:text-white'
-                      }
-                      ${selectedModel === model.id ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
-                    `}
-                    onClick={() => selectModel(model.id)}
-                    disabled={model.disabled}
-                    title={getDisabledMessage(model)}
-                  >
-                    <span className="flex items-center justify-between w-full">
-                      <span className="flex items-center gap-1.5">
-                        <Sparkles size={14} className={model.disabled ? 'text-gray-400' : 'text-blue-500'} />
-                        {model.name}
-                      </span>
-                      {selectedModel === model.id && <Check size={16} className="text-blue-500" />}
-                    </span>
-                    {model.description && (
-                      <span className="text-xs text-muted-foreground">{model.description}</span>
-                    )}
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {/* Removed the Gemini models section entirely */}
           </div>
         </div>
       )}
