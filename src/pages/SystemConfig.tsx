@@ -59,7 +59,7 @@ const SystemConfig: React.FC = () => {
   );
 
   const [selectedGeminiModel, setSelectedGeminiModel] = useState<string>(
-    systemPromptSettings?.selectedGeminiModel || 'gemini-1.0-pro'
+    systemPromptSettings?.selectedGeminiModel || 'gemini-2.0-flash'
   );
 
   const geminiModels = [
@@ -101,7 +101,7 @@ const SystemConfig: React.FC = () => {
     setTemperature(0.7);
     setMaxTokens(1024);
     setGeminiApiKey('');
-    setSelectedGeminiModel('gemini-1.0-pro');
+    setSelectedGeminiModel('gemini-2.0-flash');
     
     toast({
       title: "System configuration reset",

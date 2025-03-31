@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type SystemPromptSettings = {
@@ -77,10 +76,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     maxTokens: 1024,
     autoSave: false,
     geminiApiKey: '',
-    selectedGeminiModel: 'gemini-1.5-pro'
+    selectedGeminiModel: 'gemini-2.0-flash'
   });
   
-  // Load user preferences from localStorage on initial render
   useEffect(() => {
     const savedUser = localStorage.getItem('userProfile');
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -99,7 +97,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     }
   }, []);
   
-  // Update document with dark mode class
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add('dark');

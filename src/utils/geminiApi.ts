@@ -77,22 +77,22 @@ export const sendMessageToGemini = async (
 
   // Map the UI model names to actual API model identifiers
   const modelMapping: Record<string, { apiModel: string, apiVersion: string }> = {
-    'gemini-2.0-flash': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
-    'gemini-2.0-flash-thinking': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
-    'gemini-deep-research': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
-    'gemini-personalization': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
-    'gemini-2.5-pro': { apiModel: 'gemini-1.5-pro', apiVersion: 'v1' },
-    // Fallback to gemini-1.0-pro for UI-only models
-    'baby-orchestrator': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
-    'baby-validator': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' }
+    'gemini-2.0-flash': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
+    'gemini-2.0-flash-thinking': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
+    'gemini-deep-research': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
+    'gemini-personalization': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
+    'gemini-2.5-pro': { apiModel: 'models/gemini-1.5-pro', apiVersion: 'v1beta' },
+    // Fallback to gemini-pro for UI-only models
+    'baby-orchestrator': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
+    'baby-validator': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' }
   };
   
   // Get the actual API model name and version
-  const { apiModel, apiVersion } = modelMapping[model] || { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' };
+  const { apiModel, apiVersion } = modelMapping[model] || { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' };
   console.log(`Using Gemini model: ${apiModel} (selected: ${model}) with API version: ${apiVersion}`);
   
   // Build the correct API endpoint
-  const apiEndpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${apiModel}:generateContent?key=${apiKey}`;
+  const apiEndpoint = `https://generativelanguage.googleapis.com/${apiVersion}/${apiModel}:generateContent?key=${apiKey}`;
 
   try {
     console.log(`Sending request to Gemini API endpoint: ${apiEndpoint}`);
