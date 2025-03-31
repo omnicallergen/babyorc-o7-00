@@ -6,6 +6,8 @@ type SystemPromptSettings = {
   temperature: number;
   maxTokens: number;
   autoSave: boolean;
+  geminiApiKey?: string;
+  selectedGeminiModel?: string;
 };
 
 type UserProfile = {
@@ -73,7 +75,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     prompt: 'You are go:lofty, an AI assistant specialized in consulting. Provide helpful, accurate, and concise advice.',
     temperature: 0.7,
     maxTokens: 1024,
-    autoSave: false
+    autoSave: false,
+    geminiApiKey: '',
+    selectedGeminiModel: 'gemini-1.5-pro'
   });
   
   // Load user preferences from localStorage on initial render

@@ -7,7 +7,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { ArrowLeft, Save, RotateCw, Cpu, MessageSquare, Sparkles, Info } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Save, 
+  RotateCw, 
+  Cpu, 
+  MessageSquare, 
+  Sparkles, 
+  Info, 
+  Key, 
+  Bot 
+} from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -16,6 +26,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const SystemConfig: React.FC = () => {
   const { user, updateSystemPrompt, systemPromptSettings } = useUser();
@@ -38,6 +55,22 @@ const SystemConfig: React.FC = () => {
     systemPromptSettings?.autoSave || false
   );
 
+  const [geminiApiKey, setGeminiApiKey] = useState<string>(
+    systemPromptSettings?.geminiApiKey || ''
+  );
+
+  const [selectedGeminiModel, setSelectedGeminiModel] = useState<string>(
+    systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro'
+  );
+
+  // Available Gemini models
+  const geminiModels = [
+    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
+    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
+    { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro' },
+    { id: 'gemini-ultra', name: 'Gemini Ultra' }
+  ];
+
   // Auto save when enabled
   useEffect(() => {
     if (autoSaveEnabled) {
@@ -47,18 +80,20 @@ const SystemConfig: React.FC = () => {
       
       return () => clearTimeout(timer);
     }
-  }, [systemPrompt, temperature, maxTokens, autoSaveEnabled]);
+  }, [systemPrompt, temperature, maxTokens, autoSaveEnabled, geminiApiKey, selectedGeminiModel]);
 
   const handleSave = () => {
     updateSystemPrompt({
       prompt: systemPrompt,
       temperature: temperature,
       maxTokens: maxTokens,
-      autoSave: autoSaveEnabled
+      autoSave: autoSaveEnabled,
+      geminiApiKey: geminiApiKey,
+      selectedGeminiModel: selectedGeminiModel
     });
     
     toast({
-      title: "System prompt updated",
+      title: "System configuration updated",
       description: "Your AI configuration has been saved successfully"
     });
   };
@@ -67,10 +102,12 @@ const SystemConfig: React.FC = () => {
     setSystemPrompt('You are go:lofty, an AI assistant specialized in consulting. Provide helpful, accurate, and concise advice.');
     setTemperature(0.7);
     setMaxTokens(1024);
+    setGeminiApiKey('');
+    setSelectedGeminiModel('gemini-1.5-pro');
     
     toast({
-      title: "System prompt reset",
-      description: "System prompt has been reset to default values"
+      title: "System configuration reset",
+      description: "System settings have been reset to default values"
     });
   };
 
@@ -94,6 +131,85 @@ const SystemConfig: React.FC = () => {
         </h1>
         
         <div className="space-y-6">
+          {/* Gemini API Configuration Section */}
+          <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Bot size={20} />
+              Gemini API Configuration
+            </h2>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="geminiApiKey" className="text-base">API Key</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info size={16} className="text-gray-500 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        Enter your Gemini API key. You can get one from Google AI Studio.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <div className="relative">
+                <Input
+                  id="geminiApiKey"
+                  type="password"
+                  value={geminiApiKey}
+                  onChange={(e) => setGeminiApiKey(e.target.value)}
+                  placeholder="Enter your Gemini API key"
+                  className="pr-10 dark:bg-gray-600"
+                />
+                <Key size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Your API key is stored locally and never sent to our servers
+              </p>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label htmlFor="geminiModel" className="text-base">Gemini Model</Label>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info size={16} className="text-gray-500 cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">
+                        Select the Gemini model to use for AI responses and document analysis.
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
+              <Select
+                value={selectedGeminiModel}
+                onValueChange={setSelectedGeminiModel}
+              >
+                <SelectTrigger className="w-full dark:bg-gray-600">
+                  <SelectValue placeholder="Select a model" />
+                </SelectTrigger>
+                <SelectContent>
+                  {geminiModels.map((model) => (
+                    <SelectItem key={model.id} value={model.id}>
+                      {model.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground">
+                Different models have different capabilities and token limits
+              </p>
+            </div>
+          </div>
+          
+          <Separator />
+          
+          {/* System Prompt Section */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
               <Label htmlFor="systemPrompt" className="text-lg">System Prompt</Label>

@@ -1,17 +1,21 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { FileText, Upload, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+  Sheet, 
+  SheetContent, 
+  SheetHeader, 
+  SheetTitle, 
+  SheetDescription, 
+  SheetFooter 
+} from '@/components/ui/sheet';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Loader2, Upload, FileText, CheckCircle, CircleAlert, ExternalLink } from 'lucide-react';
+import { analyzeDocument, VerificationResult } from '@/utils/documentAnalysis';
+import { useToast } from '@/hooks/use-toast';
+import { Progress } from '@/components/ui/progress';
 import { useUser } from '@/contexts/UserContext';
 
 interface DocumentVerifierProps {
@@ -20,272 +24,333 @@ interface DocumentVerifierProps {
 }
 
 const DocumentVerifier: React.FC<DocumentVerifierProps> = ({ isOpen, onClose }) => {
-  const [file, setFile] = useState<File | null>(null);
+  const { systemPromptSettings } = useUser();
+  const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [businessStrategy, setBusinessStrategy] = useState('');
   const [missionVision, setMissionVision] = useState('');
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationResult, setVerificationResult] = useState<any | null>(null);
-  const [step, setStep] = useState(1);
-  const { toast } = useToast();
-  const { systemPromptSettings } = useUser();
-
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [result, setResult] = useState<VerificationResult | null>(null);
+  
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+      setSelectedFile(e.target.files[0]);
     }
   };
-
+  
+  const handleFileUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+  
   const handleVerify = async () => {
-    if (!file) {
+    if (!selectedFile) {
       toast({
-        title: "No document selected",
+        title: "No file selected",
         description: "Please upload a document to verify",
-        variant: "destructive",
+        variant: "destructive"
       });
       return;
     }
-
-    if (!businessStrategy.trim() || !missionVision.trim()) {
+    
+    if (!businessStrategy.trim()) {
       toast({
-        title: "Missing information",
-        description: "Please provide both business strategy and mission/vision",
-        variant: "destructive",
+        title: "Business strategy required",
+        description: "Please enter your business strategy to continue",
+        variant: "destructive"
       });
       return;
     }
-
-    setIsVerifying(true);
+    
+    if (!missionVision.trim()) {
+      toast({
+        title: "Mission/vision required",
+        description: "Please enter your mission and vision statements to continue",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    setIsAnalyzing(true);
+    setResult(null);
+    
+    // Simulated progress updates
+    const progressInterval = setInterval(() => {
+      setProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return prev;
+        }
+        return prev + 10;
+      });
+    }, 500);
     
     try {
-      // Here we would process the document and send it to Gemini API
-      // For now, we'll simulate the response with a timeout
+      const apiKey = systemPromptSettings?.geminiApiKey;
+      const model = systemPromptSettings?.selectedGeminiModel;
       
-      // Create FormData to handle file upload
-      const formData = new FormData();
-      formData.append('document', file);
-      formData.append('businessStrategy', businessStrategy);
-      formData.append('missionVision', missionVision);
-      
-      // If we had a system prompt setting, we would include it
-      if (systemPromptSettings?.prompt) {
-        formData.append('systemPrompt', systemPromptSettings.prompt);
+      // Show toast if no API key is configured
+      if (!apiKey) {
+        toast({
+          title: "No Gemini API key configured",
+          description: "Using mock data. Configure your API key in System Settings for production use.",
+          variant: "default"
+        });
       }
       
-      // Simulate API request to Gemini
-      setTimeout(() => {
-        // Simulate a successful response
-        const mockResult = {
-          alignmentScore: 78,
-          summary: "The document generally aligns with the business strategy, but there are areas for improvement.",
-          keyPoints: [
-            { aligned: true, point: "Product roadmap aligns with strategic objectives" },
-            { aligned: true, point: "Target market definition matches business vision" },
-            { aligned: false, point: "Competitive positioning statement needs adjustment" },
-            { aligned: false, point: "Revenue projections may be optimistic compared to strategy" },
-            { aligned: true, point: "Core values are consistently represented" },
-          ],
-          recommendations: [
-            "Refine competitive positioning to better align with business differentiation strategy",
-            "Adjust revenue projections to match strategic growth targets",
-            "Add more detail about sustainability initiatives to match mission statement",
-          ],
-          documentUrl: "https://docs.google.com/document/d/1example-doc-id/edit"
-        };
-        
-        setVerificationResult(mockResult);
-        setIsVerifying(false);
-        setStep(3);
-      }, 3000);
+      const analysisResult = await analyzeDocument({
+        document: selectedFile,
+        businessStrategy,
+        missionVision,
+        apiKey,
+        model
+      });
       
+      setResult(analysisResult);
+      setProgress(100);
+      
+      toast({
+        title: "Document analysis complete",
+        description: "Your document has been analyzed successfully",
+      });
     } catch (error) {
       console.error("Error verifying document:", error);
       toast({
-        title: "Verification failed",
-        description: "There was an error verifying your document. Please try again.",
-        variant: "destructive",
+        title: "Analysis failed",
+        description: error instanceof Error ? error.message : "Failed to analyze document",
+        variant: "destructive"
       });
-      setIsVerifying(false);
+    } finally {
+      clearInterval(progressInterval);
+      setIsAnalyzing(false);
     }
   };
-
+  
   const resetForm = () => {
-    setFile(null);
+    setSelectedFile(null);
     setBusinessStrategy('');
     setMissionVision('');
-    setVerificationResult(null);
-    setStep(1);
+    setResult(null);
+    setProgress(0);
   };
-
+  
   const handleClose = () => {
     resetForm();
     onClose();
   };
-
+  
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Verify Document Alignment</DialogTitle>
-          <DialogDescription>
-            Upload a document to verify its alignment with your business strategy.
-          </DialogDescription>
-        </DialogHeader>
-
-        {step === 1 && (
-          <>
-            <div className="grid gap-4 py-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="document-upload" className="text-sm font-medium">
-                  Upload Document
-                </label>
-                <div className="flex items-center gap-2">
-                  <input
-                    id="document-upload"
-                    type="file"
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.txt"
-                  />
-                  <Button
-                    variant="outline"
-                    onClick={() => document.getElementById('document-upload')?.click()}
-                    className="w-full py-8 border-dashed"
-                  >
-                    <Upload className="mr-2 h-4 w-4" />
-                    {file ? file.name : "Select a document to upload"}
-                  </Button>
-                </div>
-                {file && (
-                  <div className="flex items-center gap-2 text-sm text-green-600">
-                    <FileText className="h-4 w-4" />
-                    <span>{file.name}</span>
+    <Sheet open={isOpen} onOpenChange={handleClose}>
+      <SheetContent className="w-full sm:max-w-md md:max-w-xl overflow-y-auto">
+        <SheetHeader className="mb-4">
+          <SheetTitle className="text-xl flex items-center gap-2">
+            <FileText size={20} />
+            Document Verification Tool
+          </SheetTitle>
+          <SheetDescription>
+            Verify if your document aligns with business strategy
+          </SheetDescription>
+        </SheetHeader>
+        
+        {!result ? (
+          <div className="space-y-6">
+            {/* File Upload */}
+            <div className="space-y-2">
+              <Label htmlFor="document" className="text-base font-medium">
+                Document Upload
+              </Label>
+              <div 
+                className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors ${selectedFile ? 'border-green-300 bg-green-50 dark:bg-green-900/20' : 'border-gray-300 dark:border-gray-600'}`}
+                onClick={handleFileUploadClick}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  id="document"
+                  onChange={handleFileChange}
+                  accept=".pdf,.doc,.docx,.txt"
+                  className="hidden"
+                  disabled={isAnalyzing}
+                />
+                {selectedFile ? (
+                  <div className="flex flex-col items-center gap-2">
+                    <CheckCircle className="h-10 w-10 text-green-500" />
+                    <div>
+                      <p className="font-medium">{selectedFile.name}</p>
+                      <p className="text-xs text-gray-500">
+                        {(selectedFile.size / 1024).toFixed(1)} KB
+                      </p>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      className="mt-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                    >
+                      Change File
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-2">
+                    <Upload className="h-10 w-10 text-gray-400" />
+                    <p className="text-base font-medium">Click to upload a document</p>
+                    <p className="text-xs text-gray-500">
+                      PDF, DOC, DOCX, TXT up to 10MB
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>Cancel</Button>
-              <Button onClick={() => setStep(2)} disabled={!file}>Next</Button>
-            </DialogFooter>
-          </>
-        )}
-
-        {step === 2 && (
-          <>
-            <div className="grid gap-4 py-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="business-strategy" className="text-sm font-medium">
-                  Business Strategy
-                </label>
-                <Textarea
-                  id="business-strategy"
-                  placeholder="Describe your business strategy, goals, and key objectives..."
-                  value={businessStrategy}
-                  onChange={(e) => setBusinessStrategy(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <label htmlFor="mission-vision" className="text-sm font-medium">
-                  Mission and Vision
-                </label>
-                <Textarea
-                  id="mission-vision"
-                  placeholder="Describe your company's mission, vision, and core values..."
-                  value={missionVision}
-                  onChange={(e) => setMissionVision(e.target.value)}
-                  className="min-h-[100px]"
-                />
-              </div>
+            
+            {/* Business Strategy */}
+            <div className="space-y-2">
+              <Label htmlFor="businessStrategy" className="text-base font-medium">
+                Business Strategy
+              </Label>
+              <Textarea
+                id="businessStrategy"
+                placeholder="Enter your business strategy..."
+                value={businessStrategy}
+                onChange={(e) => setBusinessStrategy(e.target.value)}
+                className="min-h-24 resize-none"
+                disabled={isAnalyzing}
+              />
+              <p className="text-xs text-gray-500">
+                Include your key strategic objectives, market positioning, and competitive advantages
+              </p>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
-              <Button 
-                onClick={handleVerify}
-                disabled={isVerifying || !businessStrategy.trim() || !missionVision.trim()}
-              >
-                {isVerifying ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying...
-                  </>
-                ) : (
-                  'Verify Document'
-                )}
-              </Button>
-            </DialogFooter>
-          </>
-        )}
-
-        {step === 3 && verificationResult && (
-          <>
-            <div className="grid gap-4 py-4">
-              <div className="flex items-center justify-between border-b pb-2">
-                <h3 className="text-lg font-medium">Alignment Score</h3>
-                <div className={`text-xl font-bold ${
-                  verificationResult.alignmentScore >= 70 
-                    ? 'text-green-600' 
-                    : verificationResult.alignmentScore >= 50 
-                      ? 'text-yellow-600' 
-                      : 'text-red-600'
-                }`}>
-                  {verificationResult.alignmentScore}%
-                </div>
-              </div>
-              
-              <div>
-                <h3 className="text-md font-medium mb-2">Summary</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {verificationResult.summary}
+            
+            {/* Mission & Vision */}
+            <div className="space-y-2">
+              <Label htmlFor="missionVision" className="text-base font-medium">
+                Mission & Vision Statements
+              </Label>
+              <Textarea
+                id="missionVision"
+                placeholder="Enter your mission and vision statements..."
+                value={missionVision}
+                onChange={(e) => setMissionVision(e.target.value)}
+                className="min-h-24 resize-none"
+                disabled={isAnalyzing}
+              />
+              <p className="text-xs text-gray-500">
+                What does your organization stand for and where is it headed?
+              </p>
+            </div>
+            
+            {isAnalyzing && (
+              <div className="space-y-2 py-4">
+                <p className="text-sm font-medium text-center">
+                  Analyzing document...
+                </p>
+                <Progress value={progress} className="h-2" />
+                <p className="text-xs text-center text-gray-500">
+                  Using {systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro'} 
+                  {systemPromptSettings?.geminiApiKey ? '' : ' (mock data)'}
                 </p>
               </div>
+            )}
+            
+            <SheetFooter>
+              <Button 
+                variant="outline" 
+                onClick={handleClose}
+                disabled={isAnalyzing}
+              >
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleVerify}
+                disabled={!selectedFile || !businessStrategy.trim() || !missionVision.trim() || isAnalyzing}
+                className="min-w-32"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Analyzing
+                  </>
+                ) : "Verify Document"}
+              </Button>
+            </SheetFooter>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Results */}
+            <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="text-lg font-semibold">Alignment Score</h3>
+                <div className="text-2xl font-bold">{result.alignmentScore}%</div>
+              </div>
+              <Progress value={result.alignmentScore} className="h-2" />
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold mb-2">Summary</h3>
+                <p className="text-sm">{result.summary}</p>
+              </div>
               
               <div>
-                <h3 className="text-md font-medium mb-2">Key Points</h3>
+                <h3 className="text-lg font-semibold mb-2">Key Points</h3>
                 <ul className="space-y-2">
-                  {verificationResult.keyPoints.map((point: any, idx: number) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm">
+                  {result.keyPoints.map((point, index) => (
+                    <li key={index} className="flex items-start gap-2">
                       {point.aligned ? (
-                        <CheckCircle2 className="h-4 w-4 text-green-600 mt-0.5" />
+                        <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
                       ) : (
-                        <AlertCircle className="h-4 w-4 text-red-600 mt-0.5" />
+                        <CircleAlert className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
                       )}
-                      <span>{point.point}</span>
+                      <span className="text-sm">{point.point}</span>
                     </li>
                   ))}
                 </ul>
               </div>
               
               <div>
-                <h3 className="text-md font-medium mb-2">Recommendations</h3>
-                <ul className="list-disc pl-5 space-y-1">
-                  {verificationResult.recommendations.map((rec: string, idx: number) => (
-                    <li key={idx} className="text-sm text-gray-600 dark:text-gray-400">{rec}</li>
+                <h3 className="text-lg font-semibold mb-2">Recommendations</h3>
+                <ul className="list-disc ml-5 space-y-1">
+                  {result.recommendations.map((recommendation, index) => (
+                    <li key={index} className="text-sm">{recommendation}</li>
                   ))}
                 </ul>
               </div>
               
-              <div className="mt-4">
-                <h3 className="text-md font-medium mb-2">Detailed Report</h3>
+              <div className="pt-2">
                 <Button 
                   variant="outline" 
-                  className="w-full"
-                  onClick={() => window.open(verificationResult.documentUrl, '_blank')}
+                  className="w-full flex items-center justify-center gap-2"
+                  asChild
                 >
-                  <FileText className="mr-2 h-4 w-4" />
-                  View Complete Analysis in Google Docs
+                  <a href={result.documentUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink size={16} />
+                    View Full Report
+                  </a>
                 </Button>
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={handleClose}>Close</Button>
-              <Button onClick={resetForm}>Verify Another Document</Button>
-            </DialogFooter>
-          </>
+            
+            <SheetFooter className="gap-2">
+              <Button 
+                variant="outline" 
+                onClick={resetForm}
+              >
+                Analyze Another Document
+              </Button>
+              <Button 
+                onClick={handleClose}
+              >
+                Close
+              </Button>
+            </SheetFooter>
+          </div>
         )}
-      </DialogContent>
-    </Dialog>
+      </SheetContent>
+    </Sheet>
   );
 };
 
