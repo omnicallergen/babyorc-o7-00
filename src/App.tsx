@@ -10,6 +10,7 @@ import SystemConfig from "./pages/SystemConfig";
 import NotFound from "./pages/NotFound";
 import { useState } from "react";
 import { UserProvider } from "./contexts/UserContext";
+import OgImageTemplate from "./components/OgImageTemplate";
 
 // Convert to a proper function component
 const App = () => {
@@ -27,6 +28,7 @@ const App = () => {
               <Route path="/" element={<Index />} />
               <Route path="/settings" element={<ProfileSettings />} />
               <Route path="/system" element={<SystemConfig />} />
+              <Route path="/og-image" element={<OgImageTemplate />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
