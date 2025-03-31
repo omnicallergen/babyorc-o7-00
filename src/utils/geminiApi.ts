@@ -75,29 +75,25 @@ export const sendMessageToGemini = async (
     }
   };
 
-  // Determine the correct API endpoint based on the model
-  let apiEndpoint;
-  
-  // Map the UI model names to actual API model names
-  const modelMapping: Record<string, string> = {
-    'gemini-2.0-flash': 'gemini-pro',
-    'gemini-2.0-flash-thinking': 'gemini-pro',
-    'gemini-deep-research': 'gemini-pro',
-    'gemini-personalization': 'gemini-pro',
-    'gemini-2.5-pro': 'gemini-1.5-pro',
-    // Fallback to gemini-pro for any other model
-    'baby-orchestrator': 'gemini-pro',
-    'baby-validator': 'gemini-pro'
+  // Map the UI model names to actual API model identifiers
+  const modelMapping: Record<string, { apiModel: string, apiVersion: string }> = {
+    'gemini-2.0-flash': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
+    'gemini-2.0-flash-thinking': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
+    'gemini-deep-research': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
+    'gemini-personalization': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
+    'gemini-2.5-pro': { apiModel: 'gemini-1.5-pro', apiVersion: 'v1' },
+    // Fallback to gemini-1.0-pro for UI-only models
+    'baby-orchestrator': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' },
+    'baby-validator': { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' }
   };
   
-  // Get the actual API model name
-  const apiModel = modelMapping[model] || 'gemini-pro';
-  console.log(`Using Gemini model: ${apiModel} (selected: ${model})`);
+  // Get the actual API model name and version
+  const { apiModel, apiVersion } = modelMapping[model] || { apiModel: 'gemini-1.0-pro', apiVersion: 'v1' };
+  console.log(`Using Gemini model: ${apiModel} (selected: ${model}) with API version: ${apiVersion}`);
   
-  // Standard models use the generativeLanguage API
-  apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${apiKey}`;
+  // Build the correct API endpoint
+  const apiEndpoint = `https://generativelanguage.googleapis.com/${apiVersion}/models/${apiModel}:generateContent?key=${apiKey}`;
 
-  // Send the request to the Gemini API
   try {
     console.log(`Sending request to Gemini API endpoint: ${apiEndpoint}`);
     
@@ -165,10 +161,10 @@ export const formatMessagesForGemini = (
  */
 export const getAvailableGeminiModels = (): ModelOption[] => {
   return [
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help', disabled: false },
-    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning', disabled: false },
+    { id: 'gemini-2.0-flash', name: 'Gemini Flash', description: 'Get everyday help', disabled: false },
+    { id: 'gemini-2.0-flash-thinking', name: 'Gemini Flash Thinking (experimental)', description: 'Uses advanced reasoning', disabled: false },
     { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports', disabled: false },
     { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history', disabled: false },
-    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks', disabled: false }
+    { id: 'gemini-2.5-pro', name: 'Gemini Pro (experimental)', description: 'Best for complex tasks', disabled: false }
   ];
 };

@@ -3,15 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
-import { getAvailableGeminiModels } from '@/utils/geminiApi';
-
-// Define a type for our model objects to ensure consistency
-interface ModelOption {
-  id: string;
-  name: string;
-  disabled: boolean;
-  description?: string; // Make description optional
-}
+import { getAvailableGeminiModels, ModelOption } from '@/utils/geminiApi';
 
 const ModelSelector: React.FC = () => {
   const { selectedModel, setSelectedModel } = useChat();

@@ -59,15 +59,15 @@ const SystemConfig: React.FC = () => {
   );
 
   const [selectedGeminiModel, setSelectedGeminiModel] = useState<string>(
-    systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro'
+    systemPromptSettings?.selectedGeminiModel || 'gemini-1.0-pro'
   );
 
   const geminiModels = [
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help' },
-    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning' },
+    { id: 'gemini-2.0-flash', name: 'Gemini Flash', description: 'Get everyday help' },
+    { id: 'gemini-2.0-flash-thinking', name: 'Gemini Flash Thinking (experimental)', description: 'Uses advanced reasoning' },
     { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports' },
     { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history' },
-    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks' }
+    { id: 'gemini-2.5-pro', name: 'Gemini Pro (experimental)', description: 'Best for complex tasks' }
   ];
 
   useEffect(() => {
@@ -101,7 +101,7 @@ const SystemConfig: React.FC = () => {
     setTemperature(0.7);
     setMaxTokens(1024);
     setGeminiApiKey('');
-    setSelectedGeminiModel('gemini-1.5-pro');
+    setSelectedGeminiModel('gemini-1.0-pro');
     
     toast({
       title: "System configuration reset",
