@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Clock, FileText, Plus, User, MoreHorizontal, Sun, Moon, Trash2, Archive, Pin, Settings, FileUp, Cpu, Layers } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
@@ -44,12 +43,12 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="h-screen w-full max-w-[250px] border-r border-lofty-border dark:border-lofty-darkBorder dark:bg-lofty-darkBg flex flex-col">
-      {/* Header - Now with Layers icon beside the text */}
-      <div className="p-4 flex flex-col items-center space-y-2 border-b border-lofty-border dark:border-lofty-darkBorder">
+      {/* Header - Now with left-aligned layout */}
+      <div className="p-4 border-b border-lofty-border dark:border-lofty-darkBorder">
         <Link to="/" className="w-full">
-          <h1 className="font-medium text-center text-black dark:text-white flex items-center justify-center gap-2">
-            <Layers size={20} className="text-lofty-darkgray dark:text-white" />
-            GenAI for Consulting
+          <h1 className="font-medium text-black dark:text-white flex items-center gap-2">
+            <Layers size={16} className="text-lofty-darkgray dark:text-white" />
+            <span>GenAI for Consulting</span>
           </h1>
         </Link>
       </div>
