@@ -63,12 +63,18 @@ const SystemConfig: React.FC = () => {
     systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro'
   );
 
-  // Available Gemini models
+  // Complete list of available Gemini models
   const geminiModels = [
     { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
     { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
     { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro' },
-    { id: 'gemini-ultra', name: 'Gemini Ultra' }
+    { id: 'gemini-1.0-pro-vision', name: 'Gemini 1.0 Pro Vision' },
+    { id: 'gemini-1.0-pro-latest', name: 'Gemini 1.0 Pro Latest' },
+    { id: 'gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro Latest' },
+    { id: 'gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash Latest' },
+    { id: 'gemini-ultra', name: 'Gemini Ultra' },
+    { id: 'gemini-1.5-flash-preview', name: 'Gemini 1.5 Flash Preview' },
+    { id: 'gemini-1.5-pro-preview', name: 'Gemini 1.5 Pro Preview' }
   ];
 
   // Auto save when enabled
@@ -148,7 +154,7 @@ const SystemConfig: React.FC = () => {
                     </TooltipTrigger>
                     <TooltipContent>
                       <p className="max-w-xs">
-                        Enter your Gemini API key. You can get one from Google AI Studio.
+                        Enter your Gemini API key from Google AI Studio. Required to use the real Gemini API.
                       </p>
                     </TooltipContent>
                   </Tooltip>

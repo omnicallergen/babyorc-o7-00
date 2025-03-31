@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from './UserContext';
+import { sendMessageToGemini, formatMessagesForGemini } from '@/utils/geminiApi';
 
 type MessageRole = 'user' | 'assistant';
 
@@ -160,23 +161,51 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
     });
     
-    // Simulate assistant response
+    // Prepare for assistant response
     setIsLoading(true);
     
     try {
-      // Simulate network delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Get all messages in the current session including the just added user message
+      const currentSessionObj = sessions.find(s => s.id === currentSession);
+      if (!currentSessionObj) throw new Error("Session not found");
       
-      // In a real implementation, we would use the systemPromptSettings here
-      console.log("Using system prompt:", systemPromptSettings?.prompt);
-      console.log("Using temperature:", systemPromptSettings?.temperature);
-      console.log("Using max tokens:", systemPromptSettings?.maxTokens);
+      const allMessages = [...currentSessionObj.messages, userMessage];
+      
+      // Get the system prompt settings
+      const prompt = systemPromptSettings?.prompt || 'You are go:lofty, an AI assistant specialized in consulting. Provide helpful, accurate, and concise advice.';
+      const temperature = systemPromptSettings?.temperature || 0.7;
+      const maxTokens = systemPromptSettings?.maxTokens || 1024;
+      const apiKey = systemPromptSettings?.geminiApiKey || '';
+      const selectedGeminiModel = systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro';
+      
+      console.log("Using system prompt:", prompt);
+      console.log("Using temperature:", temperature);
+      console.log("Using max tokens:", maxTokens);
+      
+      // Generate assistant response
+      let responseText = '';
+      
+      if (apiKey) {
+        // Use real Gemini API if an API key is provided
+        const formattedMessages = formatMessagesForGemini(allMessages, prompt);
+        responseText = await sendMessageToGemini(
+          formattedMessages,
+          apiKey,
+          selectedGeminiModel,
+          temperature,
+          maxTokens
+        );
+      } else {
+        // Simulate response if no API key is provided
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        responseText = `This is a simulated response to: "${content}". Please add your Gemini API key in System Configuration to use the real Gemini API.`;
+      }
       
       // Add assistant response
       const assistantMessage: Message = {
         id: uuidv4(),
         role: 'assistant',
-        content: `This is a response to: "${content}"`
+        content: responseText
       };
       
       setSessions(prev => {
@@ -192,6 +221,13 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
           return session;
         });
+      });
+    } catch (error) {
+      console.error("Error generating response:", error);
+      toast({
+        title: "Error",
+        description: `Failed to generate response: ${error instanceof Error ? error.message : "Unknown error"}`,
+        variant: "destructive"
       });
     } finally {
       setIsLoading(false);
