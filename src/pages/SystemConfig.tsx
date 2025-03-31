@@ -63,21 +63,11 @@ const SystemConfig: React.FC = () => {
   );
 
   const geminiModels = [
-    { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro' },
-    { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash' },
-    { id: 'gemini-1.0-pro', name: 'Gemini 1.0 Pro' },
-    { id: 'gemini-1.0-pro-vision', name: 'Gemini 1.0 Pro Vision' },
-    { id: 'gemini-1.0-pro-latest', name: 'Gemini 1.0 Pro Latest' },
-    { id: 'gemini-1.5-pro-latest', name: 'Gemini 1.5 Pro Latest' },
-    { id: 'gemini-1.5-flash-latest', name: 'Gemini 1.5 Flash Latest' },
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help' },
     { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning' },
     { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports' },
     { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history' },
-    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks' },
-    { id: 'gemini-ultra', name: 'Gemini Ultra' },
-    { id: 'gemini-1.5-flash-preview', name: 'Gemini 1.5 Flash Preview' },
-    { id: 'gemini-1.5-pro-preview', name: 'Gemini 1.5 Pro Preview' }
+    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks' }
   ];
 
   useEffect(() => {
