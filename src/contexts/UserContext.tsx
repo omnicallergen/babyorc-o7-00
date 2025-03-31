@@ -7,6 +7,9 @@ type SystemPromptSettings = {
   autoSave: boolean;
   geminiApiKey?: string;
   selectedGeminiModel?: string;
+  selectedTemplateId?: string;
+  promptHistory?: string[];
+  lastUpdated?: string;
 };
 
 type UserProfile = {
@@ -35,6 +38,8 @@ interface UserContextType {
   updateNotificationSettings: (settings: Partial<UserProfile['notificationSettings']>) => void;
   updateSecuritySettings: (settings: Partial<UserProfile['securitySettings']>) => void;
   updateSystemPrompt: (settings: SystemPromptSettings) => void;
+  savePromptToHistory: (prompt: string) => void;
+  getPromptHistory: () => string[];
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -76,7 +81,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     maxTokens: 1024,
     autoSave: false,
     geminiApiKey: '',
-    selectedGeminiModel: 'gemini-2.0-flash'
+    selectedGeminiModel: 'gemini-2.0-flash',
+    selectedTemplateId: 'default-assistant',
+    promptHistory: [],
+    lastUpdated: new Date().toISOString()
   });
   
   useEffect(() => {
@@ -140,8 +148,40 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
   
   const updateSystemPrompt = (settings: SystemPromptSettings) => {
-    setSystemPromptSettings(settings);
-    localStorage.setItem('systemPromptSettings', JSON.stringify(settings));
+    const updatedSettings = {
+      ...settings,
+      lastUpdated: new Date().toISOString()
+    };
+    
+    if (systemPromptSettings.prompt !== settings.prompt && settings.prompt.trim()) {
+      savePromptToHistory(systemPromptSettings.prompt);
+    }
+    
+    setSystemPromptSettings(updatedSettings);
+    localStorage.setItem('systemPromptSettings', JSON.stringify(updatedSettings));
+  };
+  
+  const savePromptToHistory = (prompt: string) => {
+    if (!prompt.trim() || (systemPromptSettings.promptHistory && systemPromptSettings.promptHistory.includes(prompt))) {
+      return;
+    }
+    
+    const updatedHistory = [
+      prompt,
+      ...(systemPromptSettings.promptHistory || []).slice(0, 9)
+    ];
+    
+    const updatedSettings = {
+      ...systemPromptSettings,
+      promptHistory: updatedHistory
+    };
+    
+    setSystemPromptSettings(updatedSettings);
+    localStorage.setItem('systemPromptSettings', JSON.stringify(updatedSettings));
+  };
+  
+  const getPromptHistory = () => {
+    return systemPromptSettings.promptHistory || [];
   };
   
   const value = {
@@ -152,7 +192,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     updateUserProfile,
     updateNotificationSettings,
     updateSecuritySettings,
-    updateSystemPrompt
+    updateSystemPrompt,
+    savePromptToHistory,
+    getPromptHistory
   };
   
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
