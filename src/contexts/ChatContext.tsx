@@ -190,30 +190,52 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       let responseText = '';
       
-      // Only use Gemini API if API key is provided AND the selected model is a Gemini model
+      // Determine which model to use
+      // Default agents (baby-orchestrator, baby-validator, etc.) should not call Gemini API
       if (apiKey && isGeminiModel(selectedModel)) {
+        // If a Gemini model is selected AND API key exists, use the selected model
         console.log("Using Gemini API with model:", selectedModel);
-        const formattedMessages = formatMessagesForGemini(allMessages, prompt);
-        responseText = await sendMessageToGemini(
-          formattedMessages,
-          apiKey,
-          selectedModel,
-          temperature,
-          maxTokens
-        );
+        try {
+          const formattedMessages = formatMessagesForGemini(allMessages, prompt);
+          responseText = await sendMessageToGemini(
+            formattedMessages,
+            apiKey,
+            selectedModel,
+            temperature,
+            maxTokens
+          );
+        } catch (error) {
+          console.error("Gemini API error:", error);
+          // Fall back to simulated response if Gemini API call fails
+          responseText = `Error calling Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and selected model.`;
+        }
       } else if (apiKey && !isGeminiModel(selectedModel)) {
-        // If API key exists but selected model is not a Gemini model, use the configured Gemini model
-        console.log("Selected model is not a Gemini model. Using configured Gemini model:", configuredGeminiModel);
-        const formattedMessages = formatMessagesForGemini(allMessages, prompt);
-        responseText = await sendMessageToGemini(
-          formattedMessages,
-          apiKey,
-          configuredGeminiModel,
-          temperature,
-          maxTokens
-        );
+        // Handle non-Gemini models - these should be simulated or use a different API
+        if (selectedModel === 'baby-orchestrator' || selectedModel === 'baby-validator') {
+          console.log("Using local model simulation for:", selectedModel);
+          // Simulate response with local model (this is just a placeholder)
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          responseText = `This is a simulated response from the ${selectedModel} model to: "${content}".`;
+        } else {
+          // For any other non-Gemini model, use the configured Gemini model as fallback
+          console.log("Selected model is not supported. Using configured Gemini model as fallback:", configuredGeminiModel);
+          try {
+            const formattedMessages = formatMessagesForGemini(allMessages, prompt);
+            responseText = await sendMessageToGemini(
+              formattedMessages,
+              apiKey,
+              configuredGeminiModel,
+              temperature,
+              maxTokens
+            );
+          } catch (error) {
+            console.error("Fallback Gemini API error:", error);
+            responseText = `Error calling fallback Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and configuration.`;
+          }
+        }
       } else {
-        // Simulate response if no API key
+        // No API key or using a non-Gemini model without API key
+        console.log("Using simulated response (no API key or non-Gemini model)");
         await new Promise(resolve => setTimeout(resolve, 1000));
         responseText = `This is a simulated response to: "${content}". Please add your Gemini API key in System Configuration to use the real Gemini API.`;
       }

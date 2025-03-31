@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ChevronDown, Check, Sparkles, Info } from 'lucide-react';
+import { ChevronDown, Check, Sparkles, Info, Bot } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
 import { getAvailableGeminiModels, ModelOption } from '@/utils/geminiApi';
@@ -18,8 +18,18 @@ const ModelSelector: React.FC = () => {
   
   // Default models (UI-only versions) with optional description field
   const defaultModels: ModelOption[] = [
-    { id: 'baby-orchestrator', name: 'baby-orchestrator', disabled: false, description: 'Default model' },
-    { id: 'baby-validator', name: 'baby-validator', disabled: true, description: 'Coming soon' },
+    { 
+      id: 'baby-orchestrator', 
+      name: 'baby-orchestrator', 
+      disabled: false, 
+      description: 'Default assistant model' 
+    },
+    { 
+      id: 'baby-validator', 
+      name: 'baby-validator', 
+      disabled: true, 
+      description: 'Validation model (coming soon)' 
+    },
   ];
   
   // Combine with Gemini models
@@ -63,7 +73,11 @@ const ModelSelector: React.FC = () => {
         onClick={toggleDropdown}
       >
         <span className="flex items-center gap-2">
-          {currentModel.id.includes('gemini') && <Sparkles size={16} className="text-lofty-blue" />}
+          {currentModel.id.includes('gemini') ? (
+            <Sparkles size={16} className="text-lofty-blue" />
+          ) : (
+            <Bot size={16} className="text-lofty-green" />
+          )}
           <span>{currentModel.name}</span>
         </span>
         <ChevronDown size={16} />
@@ -75,7 +89,7 @@ const ModelSelector: React.FC = () => {
             {defaultModels.length > 0 && (
               <>
                 <div className="px-3 py-1 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">
-                  Default Models
+                  Local Models
                 </div>
                 <ul className="mb-2">
                   {defaultModels.map((model) => (
@@ -92,7 +106,10 @@ const ModelSelector: React.FC = () => {
                         title={getDisabledMessage(model)}
                       >
                         <span className="flex items-center justify-between w-full">
-                          <span>{model.name}</span>
+                          <span className="flex items-center gap-1.5">
+                            <Bot size={14} className={model.disabled ? 'text-gray-400' : 'text-lofty-green'} />
+                            {model.name}
+                          </span>
                           {selectedModel === model.id && <Check size={16} />}
                         </span>
                         {model.description && (
