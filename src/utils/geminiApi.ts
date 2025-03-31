@@ -1,3 +1,4 @@
+
 import { Message } from '@/contexts/ChatContext';
 
 // Models available in Gemini API
@@ -56,6 +57,11 @@ export const getAvailableGeminiModels = (): ModelOption[] => {
   ];
 };
 
+// Check if a model is a Gemini model
+export const isGeminiModel = (modelId: string): boolean => {
+  return modelId.startsWith('gemini-');
+};
+
 // Format messages for Gemini API
 export const formatMessagesForGemini = (
   messages: Message[],
@@ -92,6 +98,10 @@ export const sendMessageToGemini = async (
   try {
     if (!apiKey) {
       throw new Error("API key is required");
+    }
+    
+    if (!isGeminiModel(modelName)) {
+      throw new Error(`Invalid Gemini model: ${modelName}. Model ID must start with 'gemini-'`);
     }
     
     console.log(`Sending request to Gemini API with model: ${modelName}`);

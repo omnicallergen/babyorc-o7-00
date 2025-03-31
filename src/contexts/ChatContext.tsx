@@ -3,7 +3,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { useToast } from '@/hooks/use-toast';
 import { useUser } from './UserContext';
-import { sendMessageToGemini, formatMessagesForGemini } from '@/utils/geminiApi';
+import { sendMessageToGemini, formatMessagesForGemini, isGeminiModel } from '@/utils/geminiApi';
 
 export type MessageRole = 'user' | 'assistant';
 
@@ -181,15 +181,18 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const temperature = systemPromptSettings?.temperature || 0.7;
       const maxTokens = systemPromptSettings?.maxTokens || 1024;
       const apiKey = systemPromptSettings?.geminiApiKey || '';
+      const configuredGeminiModel = systemPromptSettings?.selectedGeminiModel || 'gemini-2.0-flash';
       
       console.log("Using system prompt:", prompt);
       console.log("Using temperature:", temperature);
       console.log("Using max tokens:", maxTokens);
-      console.log("Using model:", selectedModel);
+      console.log("Selected model:", selectedModel);
       
       let responseText = '';
       
-      if (apiKey) {
+      // Only use Gemini API if API key is provided AND the selected model is a Gemini model
+      if (apiKey && isGeminiModel(selectedModel)) {
+        console.log("Using Gemini API with model:", selectedModel);
         const formattedMessages = formatMessagesForGemini(allMessages, prompt);
         responseText = await sendMessageToGemini(
           formattedMessages,
@@ -198,7 +201,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
           temperature,
           maxTokens
         );
+      } else if (apiKey && !isGeminiModel(selectedModel)) {
+        // If API key exists but selected model is not a Gemini model, use the configured Gemini model
+        console.log("Selected model is not a Gemini model. Using configured Gemini model:", configuredGeminiModel);
+        const formattedMessages = formatMessagesForGemini(allMessages, prompt);
+        responseText = await sendMessageToGemini(
+          formattedMessages,
+          apiKey,
+          configuredGeminiModel,
+          temperature,
+          maxTokens
+        );
       } else {
+        // Simulate response if no API key
         await new Promise(resolve => setTimeout(resolve, 1000));
         responseText = `This is a simulated response to: "${content}". Please add your Gemini API key in System Configuration to use the real Gemini API.`;
       }
