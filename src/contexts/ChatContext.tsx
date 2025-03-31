@@ -181,7 +181,6 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const temperature = systemPromptSettings?.temperature || 0.7;
       const maxTokens = systemPromptSettings?.maxTokens || 1024;
       const apiKey = systemPromptSettings?.geminiApiKey || '';
-      const configuredGeminiModel = systemPromptSettings?.selectedGeminiModel || 'gemini-2.0-flash';
       
       console.log("Using system prompt:", prompt);
       console.log("Using temperature:", temperature);
@@ -190,35 +189,19 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       let responseText = '';
       
-      // Determine which model to use
-      // Default agents (baby-orchestrator, baby-validator, etc.) should not call Gemini API
-      if (apiKey && isGeminiModel(selectedModel)) {
-        // If a Gemini model is selected AND API key exists, use the selected model
-        console.log("Using Gemini API with model:", selectedModel);
-        try {
-          const formattedMessages = formatMessagesForGemini(allMessages, prompt);
-          responseText = await sendMessageToGemini(
-            formattedMessages,
-            apiKey,
-            selectedModel,
-            temperature,
-            maxTokens
-          );
-        } catch (error) {
-          console.error("Gemini API error:", error);
-          // Fall back to simulated response if Gemini API call fails
-          responseText = `Error calling Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and selected model.`;
-        }
-      } else if (apiKey && !isGeminiModel(selectedModel)) {
-        // Handle non-Gemini models - these should be simulated or use a different API
+      // Check if API key is configured
+      if (!apiKey) {
+        // No API key available, use simulated response
+        console.log("No API key configured. Using simulated response.");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        responseText = `This is a simulated response to: "${content}". Please add your Gemini API key in System Configuration to use the real Gemini API.`;
+      } else {
+        // API key is available
         if (selectedModel === 'baby-orchestrator' || selectedModel === 'baby-validator') {
-          console.log("Using local model simulation for:", selectedModel);
-          // Simulate response with local model (this is just a placeholder)
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          responseText = `This is a simulated response from the ${selectedModel} model to: "${content}".`;
-        } else {
-          // For any other non-Gemini model, use the configured Gemini model as fallback
-          console.log("Selected model is not supported. Using configured Gemini model as fallback:", configuredGeminiModel);
+          // For local models, still use the real Gemini API but with the configured model
+          const configuredGeminiModel = systemPromptSettings?.selectedGeminiModel || 'gemini-2.0-flash';
+          console.log("Using configured Gemini model for local model:", configuredGeminiModel);
+          
           try {
             const formattedMessages = formatMessagesForGemini(allMessages, prompt);
             responseText = await sendMessageToGemini(
@@ -229,15 +212,31 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
               maxTokens
             );
           } catch (error) {
-            console.error("Fallback Gemini API error:", error);
-            responseText = `Error calling fallback Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and configuration.`;
+            console.error("Gemini API error:", error);
+            responseText = `Error calling Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and try again.`;
           }
+        } else if (isGeminiModel(selectedModel)) {
+          // Using a specific Gemini model selected by the user
+          console.log("Using specific Gemini model:", selectedModel);
+          
+          try {
+            const formattedMessages = formatMessagesForGemini(allMessages, prompt);
+            responseText = await sendMessageToGemini(
+              formattedMessages,
+              apiKey,
+              selectedModel,
+              temperature,
+              maxTokens
+            );
+          } catch (error) {
+            console.error("Gemini API error:", error);
+            responseText = `Error calling Gemini API: ${error instanceof Error ? error.message : "Unknown error"}. Please check your API key and selected model.`;
+          }
+        } else {
+          // Unknown model type
+          console.error("Unknown model type:", selectedModel);
+          responseText = `Unsupported model selected: ${selectedModel}. Please select a valid model in the model selector.`;
         }
-      } else {
-        // No API key or using a non-Gemini model without API key
-        console.log("Using simulated response (no API key or non-Gemini model)");
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        responseText = `This is a simulated response to: "${content}". Please add your Gemini API key in System Configuration to use the real Gemini API.`;
       }
       
       const assistantMessage: Message = {
