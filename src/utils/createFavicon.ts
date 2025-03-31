@@ -7,9 +7,16 @@ export function setFavicon() {
   // But let's also set a fallback for older browsers
 
   // Check if the browser supports SVG favicons
-  const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+  const existingLink = document.querySelector("link[rel*='icon']") as HTMLLinkElement | null;
+  const link = existingLink || document.createElement('link');
+  
+  // Now TypeScript knows that link is an HTMLLinkElement
   link.type = 'image/svg+xml';
   link.rel = 'icon';
   link.href = '/favicon.svg';
-  document.getElementsByTagName('head')[0].appendChild(link);
+  
+  // Only append the link if it wasn't already in the document
+  if (!existingLink) {
+    document.getElementsByTagName('head')[0].appendChild(link);
+  }
 }
