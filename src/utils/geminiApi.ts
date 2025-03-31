@@ -1,4 +1,3 @@
-
 import { Message } from '@/contexts/ChatContext';
 
 // Models available in Gemini API

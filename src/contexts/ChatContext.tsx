@@ -5,9 +5,9 @@ import { useToast } from '@/hooks/use-toast';
 import { useUser } from './UserContext';
 import { sendMessageToGemini, formatMessagesForGemini } from '@/utils/geminiApi';
 
-type MessageRole = 'user' | 'assistant';
+export type MessageRole = 'user' | 'assistant';
 
-interface Message {
+export interface Message {
   id: string;
   role: MessageRole;
   content: string;
