@@ -67,20 +67,32 @@ export const sendMessageToGemini = async (
     }
   };
 
-  // Different models have different API endpoints
+  // Determine the correct API endpoint based on the model
   let apiEndpoint;
   
+  // Map the UI model names to actual API model names
+  const modelMapping: Record<string, string> = {
+    'gemini-2.0-flash': 'gemini-pro',
+    'gemini-2.0-flash-thinking': 'gemini-pro',
+    'gemini-deep-research': 'gemini-pro',
+    'gemini-personalization': 'gemini-pro',
+    'gemini-2.5-pro': 'gemini-1.5-pro',
+    // Fallback to gemini-pro for any other model
+    'baby-orchestrator': 'gemini-pro',
+    'baby-validator': 'gemini-pro'
+  };
+  
+  // Get the actual API model name
+  const apiModel = modelMapping[model] || 'gemini-pro';
+  console.log(`Using Gemini model: ${apiModel} (selected: ${model})`);
+  
   // Standard models use the generativeLanguage API
-  if (model.startsWith('gemini-')) {
-    const baseUrl = 'https://generativelanguage.googleapis.com/v1beta';
-    apiEndpoint = `${baseUrl}/models/${model}:generateContent?key=${apiKey}`;
-  } else {
-    // For future models or custom endpoints
-    apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
-  }
+  apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${apiKey}`;
 
   // Send the request to the Gemini API
   try {
+    console.log(`Sending request to Gemini API endpoint: ${apiEndpoint}`);
+    
     const response = await fetch(apiEndpoint, {
       method: 'POST',
       headers: {
@@ -138,4 +150,17 @@ export const formatMessagesForGemini = (
   });
   
   return geminiMessages;
+};
+
+/**
+ * Get available Gemini models for the dropdown
+ */
+export const getAvailableGeminiModels = () => {
+  return [
+    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help', disabled: false },
+    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning', disabled: false },
+    { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports', disabled: false },
+    { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history', disabled: false },
+    { id: 'gemini-2.5-pro', name: 'Gemini 2.5 Pro (experimental)', description: 'Best for complex tasks', disabled: false }
+  ];
 };

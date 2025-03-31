@@ -1,17 +1,34 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
 import { useChat } from '@/contexts/ChatContext';
+import { useUser } from '@/contexts/UserContext';
+import { getAvailableGeminiModels } from '@/utils/geminiApi';
 
 const ModelSelector: React.FC = () => {
   const { selectedModel, setSelectedModel } = useChat();
+  const { systemPromptSettings } = useUser();
   const [isOpen, setIsOpen] = useState(false);
-
-  const models = [
+  
+  // Default models (UI-only versions)
+  const defaultModels = [
     { id: 'baby-orchestrator', name: 'baby-orchestrator', disabled: false },
     { id: 'baby-validator', name: 'baby-validator', disabled: true },
-    { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', disabled: true, description: 'Get everyday help' },
-    { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking', disabled: true, description: 'Uses advanced reasoning' },
+  ];
+  
+  // Combine with Gemini models
+  const geminiModels = getAvailableGeminiModels();
+  
+  // Check if API key is available to enable Gemini models
+  const apiKeyAvailable = !!systemPromptSettings?.geminiApiKey;
+  
+  // Combine models, making Gemini models disabled if no API key is available
+  const models = [
+    ...defaultModels,
+    ...geminiModels.map(model => ({
+      ...model, 
+      disabled: !apiKeyAvailable
+    }))
   ];
 
   const toggleDropdown = () => setIsOpen(!isOpen);
@@ -21,6 +38,13 @@ const ModelSelector: React.FC = () => {
       setSelectedModel(modelId);
     }
     setIsOpen(false);
+  };
+  
+  // Show a tooltip hint if hovering over a disabled model
+  const getDisabledMessage = (model: any) => {
+    return model.disabled && !apiKeyAvailable 
+      ? "Add Gemini API key in System Configuration to use this model" 
+      : "";
   };
 
   return (
@@ -47,6 +71,7 @@ const ModelSelector: React.FC = () => {
                   `}
                   onClick={() => selectModel(model.id)}
                   disabled={model.disabled}
+                  title={getDisabledMessage(model)}
                 >
                   <span className="flex items-center justify-between w-full">
                     <span>{model.name}</span>

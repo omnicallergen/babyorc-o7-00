@@ -176,11 +176,14 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const temperature = systemPromptSettings?.temperature || 0.7;
       const maxTokens = systemPromptSettings?.maxTokens || 1024;
       const apiKey = systemPromptSettings?.geminiApiKey || '';
-      const selectedGeminiModel = systemPromptSettings?.selectedGeminiModel || 'gemini-1.5-pro';
+      
+      // Use the selected model from the dropdown
+      const modelToUse = selectedModel;
       
       console.log("Using system prompt:", prompt);
       console.log("Using temperature:", temperature);
       console.log("Using max tokens:", maxTokens);
+      console.log("Using model:", modelToUse);
       
       // Generate assistant response
       let responseText = '';
@@ -191,7 +194,7 @@ export const ChatProvider: React.FC<{ children: React.ReactNode }> = ({ children
         responseText = await sendMessageToGemini(
           formattedMessages,
           apiKey,
-          selectedGeminiModel,
+          modelToUse,
           temperature,
           maxTokens
         );

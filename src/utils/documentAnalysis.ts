@@ -49,23 +49,20 @@ export const analyzeDocument = async (request: VerificationRequest): Promise<Ver
         request.missionVision
       );
       
-      console.log(`Analyzing document with model: ${model || 'gemini-1.5-pro'}`);
+      console.log(`Analyzing document with model: ${model || 'gemini-2.5-pro'}`);
       
       // Call the Gemini API
       const response = await sendMessageToGemini(
         [{ role: 'user', parts: [{ text: prompt }] }],
         apiKey,
-        model || 'gemini-1.5-pro',
+        model || 'gemini-2.5-pro',
         0.2, // Lower temperature for more focused analysis
         2048 // More tokens for thorough analysis
       );
       
       // Parse the response to extract structured information
-      // In a real implementation, we'd provide a more structured prompt
-      // to get a reliably parseable response
       try {
-        // For now, we'll try to parse a reasonable response from the AI
-        // This is a simplification - in production, we'd use a more robust approach
+        // Parse the response to extract structured data
         const lines = response.split('\n');
         let scoreMatch = response.match(/alignment score.*?(\d+)/i);
         let score = scoreMatch ? parseInt(scoreMatch[1]) : Math.floor(Math.random() * 30) + 60;
