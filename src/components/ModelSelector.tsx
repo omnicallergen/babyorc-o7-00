@@ -5,15 +5,23 @@ import { useChat } from '@/contexts/ChatContext';
 import { useUser } from '@/contexts/UserContext';
 import { getAvailableGeminiModels } from '@/utils/geminiApi';
 
+// Define a type for our model objects to ensure consistency
+interface ModelOption {
+  id: string;
+  name: string;
+  disabled: boolean;
+  description?: string; // Make description optional
+}
+
 const ModelSelector: React.FC = () => {
   const { selectedModel, setSelectedModel } = useChat();
   const { systemPromptSettings } = useUser();
   const [isOpen, setIsOpen] = useState(false);
   
-  // Default models (UI-only versions)
-  const defaultModels = [
-    { id: 'baby-orchestrator', name: 'baby-orchestrator', disabled: false },
-    { id: 'baby-validator', name: 'baby-validator', disabled: true },
+  // Default models (UI-only versions) with optional description field
+  const defaultModels: ModelOption[] = [
+    { id: 'baby-orchestrator', name: 'baby-orchestrator', disabled: false, description: 'Default model' },
+    { id: 'baby-validator', name: 'baby-validator', disabled: true, description: 'Coming soon' },
   ];
   
   // Combine with Gemini models
@@ -23,7 +31,7 @@ const ModelSelector: React.FC = () => {
   const apiKeyAvailable = !!systemPromptSettings?.geminiApiKey;
   
   // Combine models, making Gemini models disabled if no API key is available
-  const models = [
+  const models: ModelOption[] = [
     ...defaultModels,
     ...geminiModels.map(model => ({
       ...model, 
@@ -41,7 +49,7 @@ const ModelSelector: React.FC = () => {
   };
   
   // Show a tooltip hint if hovering over a disabled model
-  const getDisabledMessage = (model: any) => {
+  const getDisabledMessage = (model: ModelOption) => {
     return model.disabled && !apiKeyAvailable 
       ? "Add Gemini API key in System Configuration to use this model" 
       : "";

@@ -43,6 +43,14 @@ export interface GeminiChatResponse {
   promptFeedback: any;
 }
 
+// Interface for the model options
+export interface ModelOption {
+  id: string;
+  name: string;
+  disabled?: boolean;
+  description?: string;
+}
+
 /**
  * Send a message to the Gemini API
  */
@@ -155,7 +163,7 @@ export const formatMessagesForGemini = (
 /**
  * Get available Gemini models for the dropdown
  */
-export const getAvailableGeminiModels = () => {
+export const getAvailableGeminiModels = (): ModelOption[] => {
   return [
     { id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash', description: 'Get everyday help', disabled: false },
     { id: 'gemini-2.0-flash-thinking', name: 'Gemini 2.0 Flash Thinking (experimental)', description: 'Uses advanced reasoning', disabled: false },
