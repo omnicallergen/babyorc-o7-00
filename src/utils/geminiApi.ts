@@ -1,170 +1,186 @@
 
-/**
- * Gemini API Utility
- * 
- * This file contains utilities for communicating with the Google Gemini API
- */
+import { Message } from '@/contexts/ChatContext';
 
-// Types for the Gemini API requests and responses
-export interface GeminiMessage {
-  role: 'user' | 'model' | 'system';
-  parts: {
-    text?: string;
-    fileData?: {
-      mimeType: string;
-      fileUri?: string;
-      data?: string; // Base64 encoded data
-    };
-  }[];
-}
-
-export interface GeminiChatRequest {
-  contents: GeminiMessage[];
-  safetySettings?: any[];
-  generationConfig?: {
-    temperature?: number;
-    maxOutputTokens?: number;
-    topP?: number;
-    topK?: number;
-  };
-}
-
-export interface GeminiChatResponse {
-  candidates: {
-    content: {
-      role: string;
-      parts: {
-        text?: string;
-      }[];
-    };
-    finishReason: string;
-    safetyRatings: any[];
-  }[];
-  promptFeedback: any;
-}
-
-// Interface for the model options
+// Models available in Gemini API
 export interface ModelOption {
   id: string;
   name: string;
-  disabled?: boolean;
   description?: string;
+  disabled?: boolean;
+  capabilities?: string[];
+  contextWindow?: number;
+  bestFor?: string[];
 }
 
-/**
- * Send a message to the Gemini API
- */
-export const sendMessageToGemini = async (
-  messages: GeminiMessage[],
-  apiKey: string,
-  model: string,
-  temperature: number = 0.7,
-  maxTokens: number = 1024
-): Promise<string> => {
-  // Ensure we have an API key
-  if (!apiKey) {
-    throw new Error("Gemini API key is required");
-  }
-
-  // Format the request
-  const request: GeminiChatRequest = {
-    contents: messages,
-    generationConfig: {
-      temperature,
-      maxOutputTokens: maxTokens
+export const getAvailableGeminiModels = (): ModelOption[] => {
+  return [
+    { 
+      id: 'gemini-2.0-flash', 
+      name: 'Gemini Flash', 
+      description: 'Fast responses for everyday tasks',
+      capabilities: ['Text generation', 'Instruction following'],
+      contextWindow: 16384,
+      bestFor: ['Quick questions', 'Simple tasks', 'Everyday help']
+    },
+    { 
+      id: 'gemini-2.0-flash-thinking', 
+      name: 'Gemini Flash Thinking', 
+      description: 'Fast with improved reasoning',
+      capabilities: ['Text generation', 'Instruction following', 'Basic reasoning'],
+      contextWindow: 32768,
+      bestFor: ['Problem-solving', 'Step-by-step thinking', 'Detailed explanations']
+    },
+    { 
+      id: 'gemini-deep-research', 
+      name: 'Gemini Deep Research', 
+      description: 'In-depth analysis and research',
+      capabilities: ['Text generation', 'Document analysis', 'Research synthesis'],
+      contextWindow: 65536,
+      bestFor: ['Comprehensive research', 'Document analysis', 'Literature review']
+    },
+    { 
+      id: 'gemini-2.5-pro', 
+      name: 'Gemini Pro', 
+      description: 'Most capable model for complex tasks',
+      capabilities: ['Text generation', 'Advanced reasoning', 'Complex problem solving', 'Creative writing'],
+      contextWindow: 131072,
+      bestFor: ['Complex reasoning', 'Creative work', 'Long-form content', 'Consulting tasks']
+    },
+    { 
+      id: 'gemini-personalization', 
+      name: 'Gemini Personalization', 
+      description: 'Personalized responses based on history',
+      capabilities: ['Text generation', 'Personalization', 'Context awareness'],
+      contextWindow: 32768,
+      bestFor: ['Personalized advice', 'Context-aware responses', 'Tailored consulting']
     }
-  };
-
-  // Map the UI model names to actual API model identifiers
-  const modelMapping: Record<string, { apiModel: string, apiVersion: string }> = {
-    'gemini-2.0-flash': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
-    'gemini-2.0-flash-thinking': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
-    'gemini-deep-research': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
-    'gemini-personalization': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
-    'gemini-2.5-pro': { apiModel: 'models/gemini-1.5-pro', apiVersion: 'v1beta' },
-    // Fallback to gemini-pro for UI-only models
-    'baby-orchestrator': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' },
-    'baby-validator': { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' }
-  };
-  
-  // Get the actual API model name and version
-  const { apiModel, apiVersion } = modelMapping[model] || { apiModel: 'models/gemini-pro', apiVersion: 'v1beta' };
-  console.log(`Using Gemini model: ${apiModel} (selected: ${model}) with API version: ${apiVersion}`);
-  
-  // Build the correct API endpoint
-  const apiEndpoint = `https://generativelanguage.googleapis.com/${apiVersion}/${apiModel}:generateContent?key=${apiKey}`;
-
-  try {
-    console.log(`Sending request to Gemini API endpoint: ${apiEndpoint}`);
-    
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Gemini API error:', errorData);
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
-    }
-
-    const data = await response.json() as GeminiChatResponse;
-    
-    // Extract the text from the response
-    if (data.candidates && data.candidates.length > 0) {
-      const content = data.candidates[0].content;
-      if (content.parts && content.parts.length > 0 && content.parts[0].text) {
-        return content.parts[0].text;
-      }
-    }
-    
-    throw new Error('No text response from Gemini API');
-  } catch (error) {
-    console.error('Error calling Gemini API:', error);
-    throw error;
-  }
+  ];
 };
 
-/**
- * Convert our internal message format to Gemini's format
- */
+// Format messages for Gemini API
 export const formatMessagesForGemini = (
-  messages: Array<{ role: 'user' | 'assistant', content: string }>,
-  systemPrompt?: string
-): GeminiMessage[] => {
-  const geminiMessages: GeminiMessage[] = [];
+  messages: Message[],
+  systemPrompt: string
+): any[] => {
+  const formattedMessages = [];
   
-  // Add system prompt if provided
-  if (systemPrompt) {
-    geminiMessages.push({
-      role: 'system',
-      parts: [{ text: systemPrompt }]
-    });
-  }
+  // Add system prompt as the first message
+  formattedMessages.push({
+    role: 'system',
+    parts: [{ text: systemPrompt }]
+  });
   
-  // Convert each message to Gemini format
+  // Format user and assistant messages
   messages.forEach(message => {
-    geminiMessages.push({
-      role: message.role === 'assistant' ? 'model' : 'user',
+    const role = message.role === 'user' ? 'user' : 'model';
+    formattedMessages.push({
+      role: role,
       parts: [{ text: message.content }]
     });
   });
   
-  return geminiMessages;
+  return formattedMessages;
 };
 
-/**
- * Get available Gemini models for the dropdown
- */
-export const getAvailableGeminiModels = (): ModelOption[] => {
-  return [
-    { id: 'gemini-2.0-flash', name: 'Gemini Flash', description: 'Get everyday help', disabled: false },
-    { id: 'gemini-2.0-flash-thinking', name: 'Gemini Flash Thinking (experimental)', description: 'Uses advanced reasoning', disabled: false },
-    { id: 'gemini-deep-research', name: 'Deep Research', description: 'Get in-depth research reports', disabled: false },
-    { id: 'gemini-personalization', name: 'Personalization (experimental)', description: 'Help based on your Search history', disabled: false },
-    { id: 'gemini-2.5-pro', name: 'Gemini Pro (experimental)', description: 'Best for complex tasks', disabled: false }
-  ];
+// Send message to Gemini API
+export const sendMessageToGemini = async (
+  messages: any[],
+  apiKey: string,
+  modelName: string = 'gemini-2.0-flash',
+  temperature: number = 0.7,
+  maxTokens: number = 1024
+): Promise<string> => {
+  try {
+    if (!apiKey) {
+      throw new Error("API key is required");
+    }
+    
+    console.log(`Sending request to Gemini API with model: ${modelName}`);
+    
+    const endpoint = "https://generativelanguage.googleapis.com/v1beta/models/" + 
+      `${modelName}:generateContent?key=${apiKey}`;
+    
+    const requestBody = {
+      contents: messages,
+      generationConfig: {
+        temperature: temperature,
+        maxOutputTokens: maxTokens,
+        topP: 0.9,
+        topK: 40,
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_MEDIUM_AND_ABOVE"
+        }
+      ]
+    };
+    
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody)
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Gemini API Error:", errorData);
+      throw new Error(`API error: ${errorData.error?.message || response.statusText}`);
+    }
+    
+    const data = await response.json();
+    
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error("No response generated");
+    }
+    
+    return data.candidates[0].content.parts[0].text;
+  } catch (error) {
+    console.error("Error calling Gemini API:", error);
+    throw error;
+  }
+};
+
+// Test API key validity
+export const testGeminiApiKey = async (apiKey: string): Promise<boolean> => {
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+    
+    const response = await fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    if (!response.ok) {
+      return false;
+    }
+    
+    const data = await response.json();
+    return Array.isArray(data.models) && data.models.length > 0;
+  } catch (error) {
+    console.error("Error testing Gemini API key:", error);
+    return false;
+  }
+};
+
+// Get model details by ID
+export const getModelDetails = (modelId: string): ModelOption | null => {
+  const models = getAvailableGeminiModels();
+  return models.find(model => model.id === modelId) || null;
 };
